@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "outDir": "./built",
+    "baseUrl": ".",
+    "module": "commonjs",
+    "target": "es2016",
+    "lib": ["dom", "es2017"],
+    "paths": {
+      "airtable": ["node_modules/airtable/lib/airtable.js"]
+    }
+  },
+  "include": ["./src/**/**/*"]
+}

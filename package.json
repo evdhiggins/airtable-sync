@@ -1,0 +1,38 @@
+{
+  "name": "airtable-sync",
+  "version": "1.0.0",
+  "description": "A one-way sync from a local datasource to Airtable",
+  "main": "./built/main.js",
+  "scripts": {
+    "build": "npm run build:types && npm run build:src",
+    "build:src": "npx tsc -p .",
+    "build:types": "npx ttw deploy",
+    "test": "npx jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evdhiggins/airtable-sync.git"
+  },
+  "keywords": [
+    "airtable",
+    "sync"
+  ],
+  "author": "Evan Higgins <evdhiggins@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/evdhiggins/airtable-sync/issues"
+  },
+  "homepage": "https://github.com/evdhiggins/airtable-sync#readme",
+  "devDependencies": {
+    "@types/jest": "^23.3.9",
+    "@types/node": "^10.12.3",
+    "jest": "^23.6.0",
+    "ts-jest": "^23.10.4",
+    "typescript": "^3.1.6",
+    "typescript-type-writer": "github:evdhiggins/typescript-type-writer"
+  },
+  "dependencies": {
+    "airtable": "^0.5.7",
+    "dotenv": "^6.1.0"
+  }
+}
