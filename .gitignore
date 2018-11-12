@@ -1,3 +1,5 @@
 node_modules/*
 built/*
 .env
+src/config/*
+!src/config/.gitkeep
