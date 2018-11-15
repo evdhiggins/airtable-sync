@@ -1,7 +1,7 @@
 require("jest");
 import configLoader from "./processConfig";
 import { ISync } from "../../types";
-import { validSync, validConfigBase } from "../../tests/mocks";
+import { IConfigMock, IConfigSyncMock } from "../../tests/mocks";
 import { ITestFn } from "../../tests/types";
 
 describe("processConfig: it should...", () => {
@@ -10,7 +10,7 @@ describe("processConfig: it should...", () => {
       const withArray: ITestFn = () => configLoader([]);
       const withString: ITestFn = () => configLoader("");
       const withUndefined: ITestFn = () => configLoader(undefined);
-      const withObject: ITestFn = () => configLoader(validConfigBase);
+      const withObject: ITestFn = () => configLoader(IConfigMock);
 
       expect(withArray).toThrow();
       expect(withString).toThrow();
@@ -31,21 +31,21 @@ describe("processConfig: it should...", () => {
         configLoader({
           airtableBaseId: "base",
           airtableTableId: "table",
-          syncs: [validSync],
+          syncs: [IConfigSyncMock],
         });
 
       const missingBaseId: ITestFn = () =>
         configLoader({
           airtableApiKey: "key",
           airtableTableId: "table",
-          syncs: [validSync],
+          syncs: [IConfigSyncMock],
         });
 
       const missingTableId: ITestFn = () =>
         configLoader({
           airtableApiKey: "key",
           airtableBaseId: "base",
-          syncs: [validSync],
+          syncs: [IConfigSyncMock],
         });
 
       const validConfig: ITestFn = () =>
@@ -53,7 +53,7 @@ describe("processConfig: it should...", () => {
           airtableApiKey: "key",
           airtableBaseId: "base",
           airtableTableId: "table",
-          syncs: [validSync],
+          syncs: [IConfigSyncMock],
         });
 
       expect(missingApiKey).toThrow();
@@ -65,24 +65,25 @@ describe("processConfig: it should...", () => {
 
   describe("Return a value that ...", () => {
     test("Is an array", () => {
-      const result: ISync[] = configLoader(validConfigBase);
+      const result: ISync[] = configLoader(IConfigMock);
       expect(Array.isArray(result)).toBe(true);
     });
 
     test("Contains least one sync object", () => {
-      const result: ISync[] = configLoader(validConfigBase);
+      const result: ISync[] = configLoader(IConfigMock);
       expect(result.length).toBeGreaterThan(0);
       expect(result[0]).toHaveProperty("localTable");
       expect(result[0]).toHaveProperty("columns");
     });
 
     test("Contains sync objects that are properly structured", () => {
-      const results: ISync[] = configLoader(validConfigBase);
+      const results: ISync[] = configLoader(IConfigMock);
       results.forEach((sync) => {
         expect(sync.localTable).toBeDefined();
         expect(sync.airtableApiKey).toBeDefined();
         expect(sync.airtableBaseId).toBeDefined();
         expect(sync.airtableTableId).toBeDefined();
+        expect(sync.databaseClass).toBeDefined();
         expect(sync.columns).toBeDefined();
       });
     });

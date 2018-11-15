@@ -1,7 +1,40 @@
 import * as Sqlite from "better-sqlite3";
-import { ISync, IConfig, ILocalQuery, IQueryResult } from "../types";
+import {
+  ISync,
+  IConfig,
+  ILocalQuery,
+  IQueryResult,
+  IConfigSync,
+} from "../types";
 
-export const validSync: ISync = {
+export const ISyncMock: ISync = {
+  localTable: "table_name",
+  airtableApiKey: "key",
+  airtableBaseId: "base",
+  airtableTableId: "table",
+  databaseClass: "sqlite3",
+  columns: [
+    {
+      airtableColumn: "Column one",
+      localColumn: "column_one",
+    },
+    {
+      airtableColumn: "Column two",
+      localColumn: "column_two",
+    },
+    {
+      airtableColumn: "Column three",
+      localColumn: "column_three",
+    },
+  ],
+};
+
+export const ILocalQueryMock: ILocalQuery = {
+  tableName: ISyncMock.localTable,
+  columns: ["column_one", "column_two", "column_three"],
+};
+
+export const IConfigSyncMock: IConfigSync = {
   localTable: "table_name",
   columns: [
     {
@@ -19,19 +52,15 @@ export const validSync: ISync = {
   ],
 };
 
-export const validLocalQuery: ILocalQuery = {
-  tableName: validSync.localTable,
-  columns: ["column_one", "column_two", "column_three"],
-};
-
-export const validConfigBase: IConfig = {
+export const IConfigMock: IConfig = {
   airtableApiKey: "apiTestValueKey",
   airtableBaseId: "appTestValueBase",
   airtableTableId: "tableId",
-  syncs: [validSync],
+  databaseClass: "sqlite3",
+  syncs: [IConfigSyncMock],
 };
 
-export const validQueryResult: IQueryResult[] = [
+export const IQueryResultMock: IQueryResult[] = [
   {
     column_one: 1,
     column_two: "bar",
@@ -65,7 +94,7 @@ class SqliteStatmentMock {
   async all(params: any[]): Promise<IQueryResult[]> {
     await 0;
     this.params = params;
-    return validQueryResult;
+    return IQueryResultMock;
   }
   async run(params: any[]): Promise<IRunInfoMock> {
     await 0;

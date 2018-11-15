@@ -1,6 +1,6 @@
 require("jest");
 import getRowsToSync from "./fetchRowsToSync";
-import { validLocalQuery, SqliteMock } from "../../../tests/mocks";
+import { ILocalQueryMock, SqliteMock } from "../../../tests/mocks";
 import { IQueryResult } from "src/types";
 
 /**
@@ -13,7 +13,7 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
     expect.assertions(1);
     const result: IQueryResult[] = await getRowsToSync(
       new SqliteMock("path/to/db.sql"),
-      validLocalQuery,
+      ILocalQueryMock,
     );
     expect(Array.isArray(result)).toBe(true);
   });
@@ -21,7 +21,7 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
   test("Generate a SQL string with a number of '?'s that match the number of params", async () => {
     expect.assertions(1);
     const mockDb: SqliteMock = new SqliteMock("path/to/db.sql");
-    await getRowsToSync(mockDb, validLocalQuery);
+    await getRowsToSync(mockDb, ILocalQueryMock);
     const numberOfParams: number = mockDb.sql.split("?").length - 1;
     expect(numberOfParams).toBe(mockDb.statementMock.params.length);
   });
@@ -29,8 +29,8 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
   test("Generate the correct number of params", async () => {
     expect.assertions(1);
     const mockDb: SqliteMock = new SqliteMock("path/to/db.sql");
-    await getRowsToSync(mockDb, validLocalQuery);
-    const expectedNumber: number = validLocalQuery.columns.length + 1;
+    await getRowsToSync(mockDb, ILocalQueryMock);
+    const expectedNumber: number = ILocalQueryMock.columns.length + 1;
     expect(mockDb.statementMock.params.length).toBe(expectedNumber);
   });
 });

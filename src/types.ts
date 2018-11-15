@@ -10,6 +10,11 @@ export interface IColumn {
   airtableColumn: string;
 
   /**
+   * The value that is being synced
+   */
+  value?: any;
+
+  /**
    * Perform any desired modifications on synced data prior to transmission
    * @param cell The column value returned from the local table query
    */
@@ -17,6 +22,65 @@ export interface IColumn {
 }
 
 export interface ISync {
+  /**
+   * The local table name.
+   */
+  localTable: string;
+
+  /**
+   * The airtable API key to use. If not specified the config api key will be used
+   */
+  airtableApiKey: string;
+
+  /**
+   * The airtable Base ID used in this sync. If not specified the config base id will be used
+   */
+  airtableBaseId: string;
+
+  /**
+   * The name or table ID of the Airtable table used in this sync. If not specified the config table id will be used
+   */
+  airtableTableId: string;
+
+  /**
+   * The name of the database class used when performing local queries. The class must fully implement IDatabase. Defaults to `sqlite3`
+   */
+  databaseClass?: string;
+
+  /**
+   * Columns to sync
+   */
+  columns: IColumn[];
+}
+
+export class SyncRow implements ISync {
+  public localTable: string;
+  public airtableApiKey: string;
+  public airtableBaseId: string;
+  public airtableTableId: string;
+  public databaseClass: string;
+  public columns: IColumn[];
+
+  /**
+   * The airtable row (record) id
+   */
+  public recordId: string;
+
+  constructor(sync: ISync, row: IQueryResult) {
+    this.localTable = sync.localTable;
+    this.airtableApiKey = sync.airtableApiKey;
+    this.airtableBaseId = sync.airtableBaseId;
+    this.airtableTableId = sync.airtableTableId;
+    this.databaseClass = sync.databaseClass;
+    this.columns = sync.columns.map((c) => {
+      const column: IColumn = Object.assign({}, c);
+      column.value = row[column.localColumn];
+      return column;
+    });
+  }
+}
+
+export interface IConfigSync {
   /**
    * The local table name.
    */
@@ -36,6 +100,11 @@ export interface ISync {
    * The name or table ID of the Airtable table used in this sync. If not specified the config table id will be used
    */
   airtableTableId?: string;
+
+  /**
+   * The name of the database class used when performing local queries. Default: sqlite3
+   */
+  databaseClass?: string;
 
   /**
    * Columns to sync
@@ -60,9 +129,13 @@ export interface IConfig {
   airtableTableId?: string;
 
   /**
+   * The name of the database class used when performing local queries. Default: sqlite3
+   */
+  databaseClass?: string;
+  /**
    * Syncs to perform
    */
-  syncs: ISync[];
+  syncs: IConfigSync[];
 }
 
 export interface ILocalQuery {

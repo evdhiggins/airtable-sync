@@ -8,13 +8,15 @@ export default (configBase: any): ISync[] => {
     throw new Error("Config base must contain at least one sync object");
   }
 
-  // set root-level airtable configurations
+  // set root-level configurations
   const airtableApiKey: string =
     configBase.airtableApiKey || process.env.AIRTABLE_API_KEY;
   const airtableBaseId: string =
     configBase.airtableBaseId || process.env.AIRTABLE_BASE_ID;
   const airtableTableId: string =
     configBase.airtableTableId || process.env.AIRTABLE_TABLE_ID;
+  const rootDatabaseClass: string =
+    configBase.databaseClass || process.env.DATABASE_CLASS || "sqlite3";
 
   const syncs: ISync[] = [];
 
@@ -23,6 +25,7 @@ export default (configBase: any): ISync[] => {
     const apiKey: string = sync.airtableApiKey || airtableApiKey;
     const baseId: string = sync.airtableBaseId || airtableBaseId;
     const tableId: string = sync.airtableTableId || airtableTableId;
+    const databaseClass: string = sync.databaseClass || rootDatabaseClass;
 
     if (!apiKey || !baseId || !tableId) {
       throw new Error(
@@ -37,6 +40,7 @@ export default (configBase: any): ISync[] => {
       airtableApiKey: apiKey,
       airtableBaseId: baseId,
       airtableTableId: tableId,
+      databaseClass,
     });
   });
 
