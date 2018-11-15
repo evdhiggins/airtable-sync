@@ -1,7 +1,7 @@
 require("jest");
 import configLoader from "./processConfig";
 import { ISync } from "../../types";
-import { validSync, validConfigBase } from "../../tests/dataMock";
+import { validSync, validConfigBase } from "../../tests/mocks";
 import { ITestFn } from "../../tests/types";
 
 describe("processConfig: it should...", () => {

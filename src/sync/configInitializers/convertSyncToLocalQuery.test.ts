@@ -1,7 +1,7 @@
 require("jest");
 import converter from "./convertSyncToLocalQuery";
 import { ILocalQuery } from "../../types";
-import { validSync, validLocalQuery } from "../../tests/dataMock";
+import { validSync, validLocalQuery } from "../../tests/mocks";
 
 describe("convertSyncToLocalQuery: It should...", () => {
   test("Return valid ILocalQuery object", () => {

@@ -76,3 +76,35 @@ export interface ILocalQuery {
    */
   columns: string[];
 }
+
+/**
+ * A flattened row of results from a query
+ */
+export interface IQueryResult {
+  [index: string]: any;
+}
+
+/**
+ * An object used to update local db rows after syncing
+ */
+export interface IUpdateQuery {
+  /**
+   * The name of the table used in the query
+   */
+  tableName: string;
+  rows: IQueryResult[];
+}
+
+export interface IDatabase {
+  /**
+   * Fetch all rows to be pushed to Airtable
+   * @param localQuery
+   */
+  fetchRowsToSync(localQuery: ILocalQuery): Promise<IQueryResult[]>;
+
+  /**
+   * Update all synced rows, adding Airtable record ID's and updating flags
+   * @param updateQuery
+   */
+  updateSyncedRows(localQuery: IUpdateQuery): Promise<void>;
+}
