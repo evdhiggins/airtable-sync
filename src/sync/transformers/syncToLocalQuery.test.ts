@@ -1,17 +1,17 @@
 require("jest");
-import converter from "./convertSyncToLocalQuery";
+import converter from "./syncToLocalQuery";
 import { ILocalQuery } from "../../types";
-import { validSync, validLocalQuery } from "../../tests/mocks";
+import { ISyncMock, ILocalQueryMock } from "../../tests/mocks";
 
 describe("convertSyncToLocalQuery: It should...", () => {
   test("Return valid ILocalQuery object", () => {
-    const result: ILocalQuery = converter(validSync);
+    const result: ILocalQuery = converter(ISyncMock);
     expect(result.tableName).toBeDefined();
     expect(result.columns).toBeDefined();
     expect(Array.isArray(result.columns)).toBe(true);
   });
   test("Properly convert columns", () => {
-    const result: ILocalQuery = converter(validSync);
-    expect(result.columns).toEqual(validLocalQuery.columns);
+    const result: ILocalQuery = converter(ISyncMock);
+    expect(result.columns).toEqual(ILocalQueryMock.columns);
   });
 });
