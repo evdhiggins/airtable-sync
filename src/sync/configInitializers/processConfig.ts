@@ -1,6 +1,7 @@
-import { ISync } from "src/types";
+import Sync from "./../../classes/Sync.class";
+import { IConfigSync } from "src/types";
 
-export default (configBase: any): ISync[] => {
+export default (configBase: any): Sync[] => {
   if (!configBase || !(configBase.constructor === Object)) {
     throw new TypeError("Config base must be an object");
   }
@@ -17,31 +18,55 @@ export default (configBase: any): ISync[] => {
     configBase.airtableTableId || process.env.AIRTABLE_TABLE_ID;
   const rootDatabaseClass: string =
     configBase.databaseClass || process.env.DATABASE_CLASS || "sqlite3";
+  const rootDatabaseOptions: any = configBase.databaseOptions;
+  const rootLocalIdColumns: any = configBase.localIdColumns;
+  const rootSyncFlag: any = configBase.syncFlag;
 
-  const syncs: ISync[] = [];
+  const syncs: Sync[] = [];
 
-  configBase.syncs.forEach((sync: ISync) => {
+  configBase.syncs.forEach((sync: IConfigSync) => {
     // use sync-specific airtable config if defined, otherwise fall back on root config
     const apiKey: string = sync.airtableApiKey || airtableApiKey;
     const baseId: string = sync.airtableBaseId || airtableBaseId;
     const tableId: string = sync.airtableTableId || airtableTableId;
     const databaseClass: string = sync.databaseClass || rootDatabaseClass;
+    const databaseOptions: any =
+      sync.databaseOptions || rootDatabaseOptions || {};
+    const localIdColumns: any = sync.localIdColumns || rootLocalIdColumns;
+    const syncFlag: any = sync.syncFlag || rootSyncFlag;
 
     if (!apiKey || !baseId || !tableId) {
       throw new Error(
-        "Missing Airtable field. Airtable API Key, Base ID, and Table ID are all required.",
+        "Missing Airtable field. Airtable API Key, Base ID, and Table ID are all required."
+      );
+    }
+
+    if (
+      !localIdColumns ||
+      !syncFlag ||
+      !localIdColumns.recordId ||
+      !localIdColumns.primaryKey ||
+      !syncFlag.columnName
+    ) {
+      throw new Error(
+        "Missing critical sync configuration field. Please verify that you have properly added `localIdColumns` and `syncFlag` to your config file."
       );
     }
 
     // add sync
-    syncs.push({
-      localTable: sync.localTable,
-      columns: sync.columns,
-      airtableApiKey: apiKey,
-      airtableBaseId: baseId,
-      airtableTableId: tableId,
-      databaseClass,
-    });
+    syncs.push(
+      new Sync({
+        localTable: sync.localTable,
+        columns: sync.columns,
+        airtableApiKey: apiKey,
+        airtableBaseId: baseId,
+        airtableTableId: tableId,
+        databaseClass,
+        databaseOptions,
+        localIdColumns,
+        syncFlag
+      })
+    );
   });
 
   return syncs;

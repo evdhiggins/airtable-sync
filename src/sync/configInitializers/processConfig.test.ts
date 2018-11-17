@@ -1,8 +1,13 @@
 require("jest");
 import configLoader from "./processConfig";
-import { ISync } from "../../types";
-import { IConfigMock, IConfigSyncMock } from "../../tests/mocks";
+import {
+  IConfigMock,
+  IFullConfigSyncMock,
+  IPartialConfigSyncMock
+} from "../../tests/mocks";
 import { ITestFn } from "../../tests/types";
+import Sync from "../../classes/Sync.class";
+import { IConfig } from "src/types";
 
 describe("processConfig: it should...", () => {
   describe("Throw an error if...", () => {
@@ -31,21 +36,21 @@ describe("processConfig: it should...", () => {
         configLoader({
           airtableBaseId: "base",
           airtableTableId: "table",
-          syncs: [IConfigSyncMock],
+          syncs: [IPartialConfigSyncMock]
         });
 
       const missingBaseId: ITestFn = () =>
         configLoader({
           airtableApiKey: "key",
           airtableTableId: "table",
-          syncs: [IConfigSyncMock],
+          syncs: [IPartialConfigSyncMock]
         });
 
       const missingTableId: ITestFn = () =>
         configLoader({
           airtableApiKey: "key",
           airtableBaseId: "base",
-          syncs: [IConfigSyncMock],
+          syncs: [IPartialConfigSyncMock]
         });
 
       const validConfig: ITestFn = () =>
@@ -53,7 +58,7 @@ describe("processConfig: it should...", () => {
           airtableApiKey: "key",
           airtableBaseId: "base",
           airtableTableId: "table",
-          syncs: [IConfigSyncMock],
+          syncs: [IPartialConfigSyncMock]
         });
 
       expect(missingApiKey).toThrow();
@@ -65,69 +70,97 @@ describe("processConfig: it should...", () => {
 
   describe("Return a value that ...", () => {
     test("Is an array", () => {
-      const result: ISync[] = configLoader(IConfigMock);
+      const result: Sync[] = configLoader(IConfigMock);
       expect(Array.isArray(result)).toBe(true);
     });
 
     test("Contains least one sync object", () => {
-      const result: ISync[] = configLoader(IConfigMock);
+      const result: Sync[] = configLoader(IConfigMock);
       expect(result.length).toBeGreaterThan(0);
       expect(result[0]).toHaveProperty("localTable");
       expect(result[0]).toHaveProperty("columns");
     });
 
-    test("Contains sync objects that are properly structured", () => {
-      const results: ISync[] = configLoader(IConfigMock);
-      results.forEach((sync) => {
+    describe("Returned Sync classes are properly structured:", () => {
+      const sync: Sync = configLoader(IConfigMock)[0];
+
+      test("localTable exists", () => {
         expect(sync.localTable).toBeDefined();
-        expect(sync.airtableApiKey).toBeDefined();
-        expect(sync.airtableBaseId).toBeDefined();
-        expect(sync.airtableTableId).toBeDefined();
-        expect(sync.databaseClass).toBeDefined();
-        expect(sync.columns).toBeDefined();
+      });
+
+      test("Airtable fields are set", () => {
+        expect(typeof sync.airtableApiKey).toBe("string");
+        expect(typeof sync.airtableBaseId).toBe("string");
+        expect(typeof sync.airtableTableId).toBe("string");
+      });
+
+      test("Database fields are set", () => {
+        expect(typeof sync.databaseClass).toBe("string");
+        expect(sync.databaseOptions).toBeDefined();
+      });
+
+      test("localIdColumn fields are set", () => {
+        expect(sync.localIdColumns).toBeDefined();
+        expect(typeof sync.localIdColumns.primaryKey).toBe("string");
+        expect(typeof sync.localIdColumns.recordId).toBe("string");
+      });
+
+      test("syncFlag fields are set", () => {
+        expect(sync.syncFlag).toBeDefined();
+        expect(typeof sync.syncFlag.columnName).toBe("string");
+        expect(typeof sync.syncFlag.true).toBe("boolean");
+      });
+
+      test("Sync columns are set", () => {
+        expect(Array.isArray(sync.columns)).toBe(true);
       });
     });
-    test("Contains sync objects that properly inherit airtable configurations", () => {
+    test("Contains sync objects that properly inherit Airtable configurations", () => {
       const envConfigKey: string = "env_key";
       const rootConfigKey: string = "root_key";
       const localConfigKey: string = "local_key";
       process.env.AIRTABLE_API_KEY = envConfigKey;
 
-      const envResult: ISync[] = configLoader({
+      const SyncBaseMock: any = {
         airtableBaseId: "appTestValueBase",
+        databaseClass: "sqlite3",
+        databaseOptions: {},
+        localIdColumns: {
+          recordId: "record",
+          primaryKey: "id"
+        },
+        syncFlag: {
+          columnName: "sync",
+          true: true,
+          false: 0
+        },
         syncs: [
           {
             localTable: "table_name",
             airtableTableId: "tblabewhrkejwh",
-            columns: [],
-          },
-        ],
-      });
+            columns: []
+          }
+        ]
+      };
 
-      const rootResult: ISync[] = configLoader({
-        airtableApiKey: rootConfigKey,
-        airtableBaseId: "appTestValueBase",
-        syncs: [
-          {
-            localTable: "table_name",
-            airtableTableId: "tblabewhrkejwh",
-            columns: [],
-          },
-        ],
-      });
+      const envResult: Sync[] = configLoader(SyncBaseMock);
 
-      const localResult: ISync[] = configLoader({
-        airtableBaseId: "appTestValueBase",
-        airtableApiKey: rootConfigKey,
-        syncs: [
-          {
-            airtableApiKey: localConfigKey,
-            localTable: "table_name",
-            airtableTableId: "tblabewhrkejwh",
-            columns: [],
-          },
-        ],
-      });
+      const rootResult: Sync[] = configLoader(
+        Object.assign({ airtableApiKey: rootConfigKey }, SyncBaseMock)
+      );
+      const localResult: Sync[] = configLoader(
+        Object.assign({}, SyncBaseMock, {
+          airtableApiKey: rootConfigKey,
+          syncs: [
+            {
+              airtableApiKey: localConfigKey,
+              localTable: "table_name",
+              airtableTableId: "tblabewhrkejwh",
+              columns: []
+            }
+          ]
+        })
+      );
 
       expect(envResult[0].airtableApiKey).toEqual(envConfigKey);
       expect(rootResult[0].airtableApiKey).toEqual(rootConfigKey);

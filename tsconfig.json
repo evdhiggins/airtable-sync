@@ -7,7 +7,8 @@
     "target": "es2016",
     "lib": ["dom", "es2017"],
     "paths": {
-      "airtable": ["node_modules/airtable/lib/airtable.js"]
+      "airtable": ["node_modules/airtable/lib/airtable.js"],
+      "src/*": ["./src/*"]
     }
   },
   "include": ["./src/**/**/*"]
