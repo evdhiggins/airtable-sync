@@ -1,6 +1,8 @@
-import { IConfigSync, IColumn } from "src/types";
+import { IConfigSync, IColumn, IDatabase } from "src/types";
 
 export default class {
+  public database: IDatabase;
+
   /**
    * The local table name.
    */
@@ -39,7 +41,6 @@ export default class {
      * The local datastore column name for the Airtable record id
      */
     recordId: string;
-
     /**
      * The local datastore column name for the table's primary key
      */
@@ -54,12 +55,10 @@ export default class {
      * The column name for the syncFlag
      */
     columnName: string;
-
     /**
      * The syncFlag column value when a sync is required
      */
     true: boolean | number | string;
-
     /**
      * The syncFlag column value when no sync is required
      */

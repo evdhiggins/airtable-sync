@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "airtable": "^0.5.7",
+    "better-sqlite3": "^5.0.1",
     "dotenv": "^6.1.0"
   }
 }

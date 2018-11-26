@@ -3,8 +3,6 @@ import SyncBase from "./SyncBase.class";
 import Sync from "./Sync.class";
 
 export default class extends SyncBase {
-  public database: IDatabase;
-
   /**
    * The airtable row (record) id value
    */
@@ -20,7 +18,7 @@ export default class extends SyncBase {
     this.database = database;
     this.recordId = row[sync.localIdColumns.recordId];
     this.primaryKey = row[sync.localIdColumns.primaryKey];
-    this.columns = sync.columns.map(c => {
+    this.columns = sync.columns.map((c) => {
       const column: IColumn = Object.assign({}, c);
       column.value =
         typeof column.prepare === "function"

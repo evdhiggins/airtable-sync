@@ -12,8 +12,8 @@ export default class extends SyncBase {
    * @param results
    */
   public getSyncRows(results: IQueryResult[]): SyncRow[] {
-    return results.map(result => {
-      return new SyncRow(this, null, result);
+    return results.map((result) => {
+      return new SyncRow(this, this.database, result);
     });
   }
 }
