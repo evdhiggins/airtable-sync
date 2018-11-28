@@ -45,7 +45,9 @@ export default async (): Promise<void> => {
       syncRow.database.updateSyncedRows(syncRow);
     });
 
-    // wait 350 miliseconds between each call to avoid ever hitting the 5 calls / second api limit
-    await wait(350);
+    // wait 500 miliseconds between each call to avoid ever hitting the 5 calls / second api limit
+    // each airtable update call might call the Airtable api up to 2x,
+    // meaning the max call rate is limited to 4x / second
+    await wait(500);
   }
 };
