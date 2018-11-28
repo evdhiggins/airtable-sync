@@ -6,8 +6,8 @@ async function addRow(
   table: Airtable.Table,
   airtableData: IQueryResult
 ): Promise<string> {
-  const { getId } = await table.create(airtableData);
-  return getId();
+  const record = await table.create(airtableData);
+  return record.getId();
 }
 
 export default async (table: Airtable.Table, syncRow: SyncRow) => {
