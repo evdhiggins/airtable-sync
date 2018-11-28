@@ -1,8 +1,75 @@
 require("jest");
+import updateSyncedRows from "./updateSyncedRows";
+import { SyncRowClassMock } from "../../../tests/mocks";
+import * as Sqlite from "better-sqlite3";
 
-describe("sqlite3 updateSyncedRows: It should... ", () => {
-  test("TODO", async () => {
-    expect.assertions(1);
-    expect(true).toBe(true);
+const sqlite = new Sqlite("./db", { memory: true });
+
+// create in-memory table for tests
+sqlite.exec(
+  "CREATE TABLE test_tb (id INTEGER, column_one VARCHAR(15), column_two VARCHAR(15), column_three VARCHAR(15), sync_flag VARCHAR(1), record_id VARCHAR(15))",
+);
+
+describe("sqlite3 getRowsToSync: It should... ", () => {
+  describe("Update the correct fields...", () => {
+    beforeEach(() => {
+      sqlite.exec("DELETE FROM test_tb");
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
+      );
+    });
+
+    test("Sync flag", async () => {
+      expect.assertions(1);
+      await updateSyncedRows(sqlite, SyncRowClassMock);
+      const row = sqlite.prepare("SELECT * FROM test_tb WHERE id=1").get();
+      expect(row[SyncRowClassMock.syncFlag.columnName]).toBe(
+        SyncRowClassMock.syncFlag.false,
+      );
+    });
+    test("Airtable ID", async () => {
+      expect.assertions(1);
+      await updateSyncedRows(sqlite, SyncRowClassMock);
+      const row = sqlite.prepare("SELECT * FROM test_tb WHERE id=1").get();
+      expect(row[SyncRowClassMock.localIdColumns.recordId]).toBe(
+        SyncRowClassMock.recordId,
+      );
+    });
+  });
+
+  describe("Not update unrelated fields", () => {
+    beforeEach(() => {
+      sqlite.exec("DELETE FROM test_tb");
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
+      );
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (2,'foo2', 'bar2', 'foobar2', 'T', NULL);",
+      );
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (3,'foo3', 'bar3', 'foobar3', 'T', NULL);",
+      );
+    });
+
+    test("Non-sync data fields", async () => {
+      expect.assertions(3);
+      await updateSyncedRows(sqlite, SyncRowClassMock);
+      const row = sqlite.prepare("SELECT * FROM test_tb WHERE id=1").get();
+      expect(row.column_one).toBe("foo1");
+      expect(row.column_two).toBe("bar1");
+      expect(row.column_three).toBe("foobar1");
+    });
+
+    test("Other rows", async () => {
+      expect.assertions(4);
+      await updateSyncedRows(sqlite, SyncRowClassMock);
+      const row2 = sqlite.prepare("SELECT * FROM test_tb WHERE id=2").get();
+      const row3 = sqlite.prepare("SELECT * FROM test_tb WHERE id=3").get();
+
+      expect(row2[SyncRowClassMock.localIdColumns.recordId]).toBe(null);
+      expect(row2[SyncRowClassMock.syncFlag.columnName]).toBe("T");
+      expect(row3[SyncRowClassMock.localIdColumns.recordId]).toBe(null);
+      expect(row3[SyncRowClassMock.syncFlag.columnName]).toBe("T");
+    });
   });
 });
