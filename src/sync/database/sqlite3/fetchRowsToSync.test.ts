@@ -1,29 +1,91 @@
 require("jest");
 import getRowsToSync from "./fetchRowsToSync";
 import { SyncClassMock } from "../../../tests/mocks";
-import SqliteMock from "./__mocks__/sqlite3";
 import { IQueryResult } from "src/types";
+import * as Sqlite from "better-sqlite3";
 
-/**
- * Currently this test just examines the SQL generated.
- * TODO: Test with an in-memory SQlite db
- */
+const sqlite = new Sqlite("./db", { memory: true });
+
+// create in-memory table for tests
+sqlite.exec(
+  "CREATE TABLE test_tb (id INTEGER, column_one VARCHAR(15), column_two VARCHAR(15), column_three VARCHAR(15), sync_flag VARCHAR(1), record_id VARCHAR(15))",
+);
 
 describe("sqlite3 getRowsToSync: It should... ", () => {
-  test("Return an array", async () => {
-    expect.assertions(1);
-    const result: IQueryResult[] = await getRowsToSync(
-      new SqliteMock("path/to/db.sql"),
-      SyncClassMock
-    );
+  test("Return an empty array when no rows exist", async () => {
+    expect.assertions(2);
+    const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
     expect(Array.isArray(result)).toBe(true);
+    expect(result.length).toBe(0);
   });
 
-  test("Generate a SQL string with a number of '?'s that match the number of params", async () => {
-    expect.assertions(1);
-    const mockDb: SqliteMock = new SqliteMock("path/to/db.sql");
-    await getRowsToSync(mockDb, SyncClassMock);
-    const numberOfParams: number = mockDb.sql.split("?").length - 1;
-    expect(numberOfParams).toBe(mockDb.statementMock.params.length);
+  describe("Returned array should contain...", () => {
+    beforeEach(() => {
+      // sqlite doesn't have a TRUNCATE TABLE statement
+      sqlite.exec("DELETE FROM test_tb");
+    });
+
+    test("No data when no sync flags are set", async () => {
+      expect.assertions(2);
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'F', NULL);",
+      );
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (2,'foo2', 'bar2', 'foobar2', 'F', NULL);",
+      );
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (2,'foo2', 'bar2', 'foobar2', 'F', NULL);",
+      );
+      const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(0);
+    });
+
+    test("The same number of results as sync flags set", async () => {
+      expect.assertions(2);
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
+      );
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (2,'foo2', 'bar2', 'foobar2', 'F', NULL);",
+      );
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (2,'foo2', 'bar2', 'foobar2', 'T', NULL);",
+      );
+      const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
+      expect(Array.isArray(result)).toBe(true);
+      expect(result.length).toBe(2);
+    });
+
+    test("All columns specified in config", async () => {
+      expect.assertions(SyncClassMock.columns.length);
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
+      );
+
+      const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
+      SyncClassMock.columns.forEach((column) => {
+        expect(result[0][column.localColumn]).toBeDefined();
+      });
+    });
+
+    test("ID column", async () => {
+      expect.assertions(1);
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
+      );
+
+      const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
+      expect(result[0][SyncClassMock.localIdColumns.primaryKey]).toBeDefined();
+    });
+    test("Airtable ID column", async () => {
+      expect.assertions(1);
+      sqlite.exec(
+        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
+      );
+
+      const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
+      expect(result[0][SyncClassMock.localIdColumns.recordId]).toBeDefined();
+    });
   });
 });
