@@ -7,6 +7,7 @@
     "build": "npm run build:types && npm run build:src",
     "build:src": "npx tsc -p .",
     "build:types": "npx ttw deploy",
+    "start": "node ./main.js",
     "test": "npx jest",
     "tests": "npm run test"
   },
