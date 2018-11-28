@@ -108,7 +108,7 @@ describe("processConfig: it should...", () => {
       test("syncFlag fields are set", () => {
         expect(sync.syncFlag).toBeDefined();
         expect(typeof sync.syncFlag.columnName).toBe("string");
-        expect(typeof sync.syncFlag.true).toBe("boolean");
+        expect(typeof sync.syncFlag.true).toBe("string");
       });
 
       test("Sync columns are set", () => {

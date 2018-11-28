@@ -3,106 +3,115 @@ import Sync from "../classes/Sync.class";
 import SyncRow from "../classes/SyncRow.class";
 
 export const IFullConfigSyncMock: IConfigSync = {
-  localTable: "table_name",
+  localTable: "test_tb",
   airtableApiKey: "key",
   airtableBaseId: "base",
   airtableTableId: "table",
   databaseClass: "sqlite3",
-  databaseOptions: {},
+  databaseOptions: {
+    path: "./path/to/db",
+  },
   localIdColumns: {
     recordId: "record_id",
-    primaryKey: "id"
+    primaryKey: "id",
   },
   syncFlag: {
-    columnName: "flag",
-    true: true,
-    false: false
+    columnName: "sync_flag",
+    true: "T",
+    false: "F",
   },
   columns: [
     {
       airtableColumn: "Column one",
-      localColumn: "column_one"
+      localColumn: "column_one",
     },
     {
       airtableColumn: "Column two",
-      localColumn: "column_two"
+      localColumn: "column_two",
     },
     {
       airtableColumn: "Column three",
-      localColumn: "column_three"
-    }
-  ]
+      localColumn: "column_three",
+    },
+    {
+      airtableColumn: "ID",
+      localColumn: "id",
+    },
+  ],
 };
 
 export const IPartialConfigSyncMock: IConfigSync = {
   localTable: "table_name",
   localIdColumns: {
     recordId: "record_id",
-    primaryKey: "id"
+    primaryKey: "id",
   },
   syncFlag: {
-    columnName: "flag",
-    true: true,
-    false: false
+    columnName: "sync_flag",
+    true: "T",
+    false: "F",
   },
   columns: [
     {
       airtableColumn: "Column one",
-      localColumn: "column_one"
+      localColumn: "column_one",
     },
     {
       airtableColumn: "Column two",
-      localColumn: "column_two"
+      localColumn: "column_two",
     },
     {
       airtableColumn: "Column three",
-      localColumn: "column_three"
-    }
-  ]
+      localColumn: "column_three",
+    },
+  ],
 };
 
 export const IConfigMock: IConfig = {
   airtableApiKey: "apiTestValueKey",
   airtableBaseId: "appTestValueBase",
-  airtableTableId: "tableId",
+  airtableTableId: "tblTableId",
   databaseClass: "sqlite3",
   databaseOptions: {},
   localIdColumns: {
     recordId: "record_id",
-    primaryKey: "key"
+    primaryKey: "id",
   },
   syncFlag: {
-    columnName: "to_sync",
-    true: true,
-    false: false
+    columnName: "flag",
+    true: "T",
+    false: "F",
   },
-  syncs: [IPartialConfigSyncMock]
+  syncs: [IPartialConfigSyncMock],
 };
 
 export const IQueryResultMock: IQueryResult[] = [
   {
-    column_one: 1,
+    id: 1,
+    column_one: "foo",
     column_two: "bar",
     column_three: "baz",
-    airtable_record_id: "rec1231"
+    record_id: "rec1231",
   },
   {
-    column_one: 2,
-    column_two: "bar",
-    column_three: "baz",
-    airtable_record_id: "rec1232"
+    id: 2,
+    column_one: "foo2",
+    column_two: "bar2",
+    column_three: "baz2",
+    record_id: "rec1232",
   },
   {
-    column_one: 3,
-    column_two: "bar",
-    column_three: "baz",
-    airtable_record_id: "rec1233"
-  }
+    id: 3,
+    column_one: "foo3",
+    column_two: "bar3",
+    column_three: "baz3",
+    record_id: "rec1233",
+  },
 ];
 
 export const SyncClassMock = new Sync(IFullConfigSyncMock);
 export const SyncRowClassMock = new SyncRow(
   SyncClassMock,
   null,
-  IQueryResultMock
+  IQueryResultMock[0],
 );
