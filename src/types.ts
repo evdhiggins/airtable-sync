@@ -62,6 +62,12 @@ export interface IConfigSync {
   };
 
   /**
+   * Determine if rows lacking a recordId will attempt to be found via primary key.
+   * Requires primary key column to be included in columns array. Default false.
+   */
+  airtableLookupByPrimaryKey?: boolean;
+
+  /**
    * Columns to sync
    */
   columns: IColumn[];
@@ -126,6 +132,13 @@ export interface IConfig {
      */
     false: boolean | number | string;
   };
+
+  /**
+   * Determine if rows lacking a recordId will attempt to be found via primary key.
+   * Requires primary key column to be included in columns array. Default false.
+   */
+  airtableLookupByPrimaryKey?: boolean;
+
   /**
    * Syncs to perform
    */

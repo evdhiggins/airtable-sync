@@ -111,6 +111,11 @@ describe("processConfig: it should...", () => {
         expect(typeof sync.syncFlag.true).toBe("string");
       });
 
+      test("airtableLookupByPrimaryKey is set", () => {
+        expect(sync.airtableLookupByPrimaryKey).toBeDefined();
+        expect(typeof sync.airtableLookupByPrimaryKey).toBe("boolean");
+      });
+
       test("Sync columns are set", () => {
         expect(Array.isArray(sync.columns)).toBe(true);
       });

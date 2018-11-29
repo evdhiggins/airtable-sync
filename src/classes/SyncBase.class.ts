@@ -66,6 +66,12 @@ export default class {
   };
 
   /**
+   * Determine if rows lacking a recordId will attempt to be found via primary key.
+   * Requires primary key column to be included in columns array. Default false.
+   */
+  airtableLookupByPrimaryKey?: boolean;
+
+  /**
    * Columns to sync
    */
   public columns: IColumn[];
@@ -79,6 +85,7 @@ export default class {
     this.databaseOptions = sync.databaseOptions;
     this.localIdColumns = sync.localIdColumns;
     this.syncFlag = sync.syncFlag;
+    this.airtableLookupByPrimaryKey = sync.airtableLookupByPrimaryKey;
     this.columns = sync.columns;
   }
 }

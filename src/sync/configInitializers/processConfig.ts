@@ -1,5 +1,7 @@
 import Sync from "./../../classes/Sync.class";
 import { IConfigSync } from "src/types";
+// tslint:disable-next-line
+const isset = (v: any): boolean => typeof v !== "undefined" && v !== null;
 
 export default (configBase: any): Sync[] => {
   if (!configBase || !(configBase.constructor === Object)) {
@@ -21,6 +23,10 @@ export default (configBase: any): Sync[] => {
   const rootDatabaseOptions: any = configBase.databaseOptions;
   const rootLocalIdColumns: any = configBase.localIdColumns;
   const rootSyncFlag: any = configBase.syncFlag;
+  const rootAirtableLookup: boolean =
+    isset(configBase.airtableLookupByPrimaryKey)
+      ? configBase.airtableLookupByPrimaryKey
+      : false;
 
   const syncs: Sync[] = [];
 
@@ -34,10 +40,14 @@ export default (configBase: any): Sync[] => {
       sync.databaseOptions || rootDatabaseOptions || {};
     const localIdColumns: any = sync.localIdColumns || rootLocalIdColumns;
     const syncFlag: any = sync.syncFlag || rootSyncFlag;
+    const airtableLookupByPrimaryKey: boolean =
+      isset(sync.airtableLookupByPrimaryKey)
+        ? sync.airtableLookupByPrimaryKey
+        : rootAirtableLookup;
 
     if (!apiKey || !baseId || !tableId) {
       throw new Error(
-        "Missing Airtable field. Airtable API Key, Base ID, and Table ID are all required."
+        "Missing Airtable field. Airtable API Key, Base ID, and Table ID are all required.",
       );
     }
 
@@ -49,7 +59,8 @@ export default (configBase: any): Sync[] => {
       !syncFlag.columnName
     ) {
       throw new Error(
-        "Missing critical sync configuration field. Please verify that you have properly added `localIdColumns` and `syncFlag` to your config file."
+        // tslint:disable-next-line
+        "Missing critical sync configuration field. Please verify that you have properly added `localIdColumns` and `syncFlag` to your config file.",
       );
     }
 
@@ -64,8 +75,9 @@ export default (configBase: any): Sync[] => {
         databaseClass,
         databaseOptions,
         localIdColumns,
-        syncFlag
-      })
+        syncFlag,
+        airtableLookupByPrimaryKey,
+      }),
     );
   });
 

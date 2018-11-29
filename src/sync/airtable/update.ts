@@ -4,9 +4,9 @@ import Airtable = require("Airtable");
 
 async function addRow(
   table: Airtable.Table,
-  airtableData: IQueryResult
+  airtableData: IQueryResult,
 ): Promise<string> {
-  const record = await table.create(airtableData);
+  const record: Airtable.Record = await table.create(airtableData);
   return record.getId();
 }
 
@@ -16,12 +16,30 @@ export default async (table: Airtable.Table, syncRow: SyncRow) => {
       acc[column.airtableColumn] = column.value;
       return acc;
     },
-    {}
+    {},
   );
 
   if (!syncRow.recordId) {
     syncRow.recordId = await addRow(table, airtableData);
     return syncRow;
+  }
+
+  if (syncRow.airtableLookupByPrimaryKey) {
+    const primaryKeyColumn: string = syncRow.columns.filter(
+      (column) => column.localColumn === syncRow.localIdColumns.primaryKey,
+    )[0].airtableColumn;
+    const records: Airtable.Record[] = await table
+      .select({
+        filterByFormula: `{${primaryKeyColumn}} = ${syncRow.primaryKey}`,
+        pageSize: 1,
+      })
+      .firstPage();
+
+    if (records[0]) {
+      await table.update(records[0].getId(), airtableData);
+      syncRow.recordId = records[0].getId();
+      return syncRow;
+    }
   }
 
   // attempt to update an existing row
