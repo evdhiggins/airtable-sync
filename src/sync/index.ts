@@ -5,5 +5,5 @@ import getDatabase from "./database";
 export default {
   airtable,
   configInitializers,
-  getDatabase
+  getDatabase,
 };

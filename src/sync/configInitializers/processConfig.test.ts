@@ -3,7 +3,7 @@ import configLoader from "./processConfig";
 import {
   IConfigMock,
   IFullConfigSyncMock,
-  IPartialConfigSyncMock
+  IPartialConfigSyncMock,
 } from "../../tests/mocks";
 import { ITestFn } from "../../tests/types";
 import Sync from "../../classes/Sync.class";
@@ -36,21 +36,21 @@ describe("processConfig: it should...", () => {
         configLoader({
           airtableBaseId: "base",
           airtableTableId: "table",
-          syncs: [IPartialConfigSyncMock]
+          syncs: [IPartialConfigSyncMock],
         });
 
       const missingBaseId: ITestFn = () =>
         configLoader({
           airtableApiKey: "key",
           airtableTableId: "table",
-          syncs: [IPartialConfigSyncMock]
+          syncs: [IPartialConfigSyncMock],
         });
 
       const missingTableId: ITestFn = () =>
         configLoader({
           airtableApiKey: "key",
           airtableBaseId: "base",
-          syncs: [IPartialConfigSyncMock]
+          syncs: [IPartialConfigSyncMock],
         });
 
       const validConfig: ITestFn = () =>
@@ -58,7 +58,7 @@ describe("processConfig: it should...", () => {
           airtableApiKey: "key",
           airtableBaseId: "base",
           airtableTableId: "table",
-          syncs: [IPartialConfigSyncMock]
+          syncs: [IPartialConfigSyncMock],
         });
 
       expect(missingApiKey).toThrow();
@@ -132,26 +132,26 @@ describe("processConfig: it should...", () => {
         databaseOptions: {},
         localIdColumns: {
           recordId: "record",
-          primaryKey: "id"
+          primaryKey: "id",
         },
         syncFlag: {
           columnName: "sync",
           true: true,
-          false: 0
+          false: 0,
         },
         syncs: [
           {
             localTable: "table_name",
             airtableTableId: "tblabewhrkejwh",
-            columns: []
-          }
-        ]
+            columns: [],
+          },
+        ],
       };
 
       const envResult: Sync[] = configLoader(SyncBaseMock);
 
       const rootResult: Sync[] = configLoader(
-        Object.assign({ airtableApiKey: rootConfigKey }, SyncBaseMock)
+        Object.assign({ airtableApiKey: rootConfigKey }, SyncBaseMock),
       );
       const localResult: Sync[] = configLoader(
         Object.assign({}, SyncBaseMock, {
@@ -161,10 +161,10 @@ describe("processConfig: it should...", () => {
               airtableApiKey: localConfigKey,
               localTable: "table_name",
               airtableTableId: "tblabewhrkejwh",
-              columns: []
-            }
-          ]
-        })
+              columns: [],
+            },
+          ],
+        }),
       );
 
       expect(envResult[0].airtableApiKey).toEqual(envConfigKey);

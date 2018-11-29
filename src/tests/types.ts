@@ -1,3 +1,1 @@
-export interface ITestFn {
-  (arg?: any): any;
-}
+export type ITestFn = (arg?: any) => any;

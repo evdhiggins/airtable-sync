@@ -3,12 +3,17 @@ import updateSyncedRows from "./updateSyncedRows";
 import { SyncRowClassMock } from "../../../tests/mocks";
 import * as Sqlite from "better-sqlite3";
 
-const sqlite = new Sqlite("./db", { memory: true });
+const sqlite: Sqlite = new Sqlite("./db", { memory: true });
 
 // create in-memory table for tests
 sqlite.exec(
+  // tslint:disable-next-line
   "CREATE TABLE test_tb (id INTEGER, column_one VARCHAR(15), column_two VARCHAR(15), column_three VARCHAR(15), sync_flag VARCHAR(1), record_id VARCHAR(15))",
 );
+
+type QueryResult = {
+  [index: string]: any;
+};
 
 describe("sqlite3 getRowsToSync: It should... ", () => {
   describe("Update the correct fields...", () => {
@@ -22,7 +27,9 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
     test("Sync flag", async () => {
       expect.assertions(1);
       await updateSyncedRows(sqlite, SyncRowClassMock);
-      const row = sqlite.prepare("SELECT * FROM test_tb WHERE id=1").get();
+      const row: QueryResult = sqlite
+        .prepare("SELECT * FROM test_tb WHERE id=1")
+        .get();
       expect(row[SyncRowClassMock.syncFlag.columnName]).toBe(
         SyncRowClassMock.syncFlag.false,
       );
@@ -30,7 +37,9 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
     test("Airtable ID", async () => {
       expect.assertions(1);
       await updateSyncedRows(sqlite, SyncRowClassMock);
-      const row = sqlite.prepare("SELECT * FROM test_tb WHERE id=1").get();
+      const row: QueryResult = sqlite
+        .prepare("SELECT * FROM test_tb WHERE id=1")
+        .get();
       expect(row[SyncRowClassMock.localIdColumns.recordId]).toBe(
         SyncRowClassMock.recordId,
       );
@@ -54,7 +63,9 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
     test("Non-sync data fields", async () => {
       expect.assertions(3);
       await updateSyncedRows(sqlite, SyncRowClassMock);
-      const row = sqlite.prepare("SELECT * FROM test_tb WHERE id=1").get();
+      const row: QueryResult = sqlite
+        .prepare("SELECT * FROM test_tb WHERE id=1")
+        .get();
       expect(row.column_one).toBe("foo1");
       expect(row.column_two).toBe("bar1");
       expect(row.column_three).toBe("foobar1");
@@ -63,8 +74,12 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
     test("Other rows", async () => {
       expect.assertions(4);
       await updateSyncedRows(sqlite, SyncRowClassMock);
-      const row2 = sqlite.prepare("SELECT * FROM test_tb WHERE id=2").get();
-      const row3 = sqlite.prepare("SELECT * FROM test_tb WHERE id=3").get();
+      const row2: QueryResult = sqlite
+        .prepare("SELECT * FROM test_tb WHERE id=2")
+        .get();
+      const row3: QueryResult = sqlite
+        .prepare("SELECT * FROM test_tb WHERE id=3")
+        .get();
 
       expect(row2[SyncRowClassMock.localIdColumns.recordId]).toBe(null);
       expect(row2[SyncRowClassMock.syncFlag.columnName]).toBe("T");

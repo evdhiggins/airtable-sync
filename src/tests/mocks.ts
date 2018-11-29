@@ -1,6 +1,6 @@
 import { IConfig, IQueryResult, IConfigSync } from "../types";
-import Sync from "../classes/Sync.class";
-import SyncRow from "../classes/SyncRow.class";
+import SyncClass from "../classes/Sync.class";
+import SyncRowClass from "../classes/SyncRow.class";
 
 export const IFullConfigSyncMock: IConfigSync = {
   localTable: "test_tb",
@@ -109,8 +109,8 @@ export const IQueryResultMock: IQueryResult[] = [
   },
 ];
 
-export const SyncClassMock = new Sync(IFullConfigSyncMock);
-export const SyncRowClassMock = new SyncRow(
+export const SyncClassMock: SyncClass = new SyncClass(IFullConfigSyncMock);
+export const SyncRowClassMock: SyncRowClass = new SyncRowClass(
   SyncClassMock,
   null,
   IQueryResultMock[0],

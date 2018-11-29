@@ -4,10 +4,11 @@ import { SyncClassMock } from "../../../tests/mocks";
 import { IQueryResult } from "src/types";
 import * as Sqlite from "better-sqlite3";
 
-const sqlite = new Sqlite("./db", { memory: true });
+const sqlite: Sqlite = new Sqlite("./db", { memory: true });
 
 // create in-memory table for tests
 sqlite.exec(
+  // tslint:disable-next-line
   "CREATE TABLE test_tb (id INTEGER, column_one VARCHAR(15), column_two VARCHAR(15), column_three VARCHAR(15), sync_flag VARCHAR(1), record_id VARCHAR(15))",
 );
 

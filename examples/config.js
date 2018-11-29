@@ -4,18 +4,18 @@ exports.config = {
   airtableTableId: "tableId",
   databaseClass: "sqlite3",
   databaseOptions: {
-    path: "./path/from/root/to/database.sql"
+    path: "./path/from/root/to/database.sql",
   },
 
   localIdColumns: {
     recordId: "record_id",
-    primaryKey: "id"
+    primaryKey: "id",
   },
 
   syncFlag: {
     columnName: "to_sync",
     true: "T",
-    false: "F"
+    false: "F",
   },
 
   syncs: [
@@ -24,9 +24,9 @@ exports.config = {
       columns: [
         {
           airtableColumn: "Column one",
-          localColumn: "column_one"
-        }
-      ]
-    }
-  ]
+          localColumn: "column_one",
+        },
+      ],
+    },
+  ],
 };

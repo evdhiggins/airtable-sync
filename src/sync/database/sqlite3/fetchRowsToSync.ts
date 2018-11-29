@@ -2,6 +2,7 @@ import * as SQlite from "better-sqlite3";
 import { IQueryResult } from "src/types";
 import Sync from "../../../classes/Sync.class";
 
+// tslint:disable-next-line
 const cleanForSql = (str: string): string => str.replace(/[^a-zA-Z_]/g, "");
 
 export default async (sqlite: any, sync: Sync): Promise<IQueryResult[]> => {
@@ -17,8 +18,8 @@ export default async (sqlite: any, sync: Sync): Promise<IQueryResult[]> => {
     selectColumns.push(sync.localIdColumns.recordId);
   }
 
-  const tableName = cleanForSql(sync.localTable);
-  const syncColumnName = cleanForSql(sync.syncFlag.columnName);
+  const tableName: string = cleanForSql(sync.localTable);
+  const syncColumnName: string = cleanForSql(sync.syncFlag.columnName);
 
   let sql: string = `SELECT ${selectColumns.join(
     ", ",

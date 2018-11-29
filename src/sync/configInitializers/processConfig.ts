@@ -23,10 +23,11 @@ export default (configBase: any): Sync[] => {
   const rootDatabaseOptions: any = configBase.databaseOptions;
   const rootLocalIdColumns: any = configBase.localIdColumns;
   const rootSyncFlag: any = configBase.syncFlag;
-  const rootAirtableLookup: boolean =
-    isset(configBase.airtableLookupByPrimaryKey)
-      ? configBase.airtableLookupByPrimaryKey
-      : false;
+  const rootAirtableLookup: boolean = isset(
+    configBase.airtableLookupByPrimaryKey,
+  )
+    ? configBase.airtableLookupByPrimaryKey
+    : false;
 
   const syncs: Sync[] = [];
 
@@ -40,10 +41,11 @@ export default (configBase: any): Sync[] => {
       sync.databaseOptions || rootDatabaseOptions || {};
     const localIdColumns: any = sync.localIdColumns || rootLocalIdColumns;
     const syncFlag: any = sync.syncFlag || rootSyncFlag;
-    const airtableLookupByPrimaryKey: boolean =
-      isset(sync.airtableLookupByPrimaryKey)
-        ? sync.airtableLookupByPrimaryKey
-        : rootAirtableLookup;
+    const airtableLookupByPrimaryKey: boolean = isset(
+      sync.airtableLookupByPrimaryKey,
+    )
+      ? sync.airtableLookupByPrimaryKey
+      : rootAirtableLookup;
 
     if (!apiKey || !baseId || !tableId) {
       throw new Error(

@@ -1,7 +1,7 @@
 import Sync from "./classes/Sync.class";
 import SyncRow from "./classes/SyncRow.class";
 
-export interface IColumn {
+export type IColumn = {
   /**
    * The column name in the local table
    */
@@ -22,9 +22,9 @@ export interface IColumn {
    * @param cell The column value returned from the local table query
    */
   prepare?: (cell: any) => any;
-}
+};
 
-export interface IConfigSync {
+export type IConfigSync = {
   /**
    * The local table name.
    */
@@ -71,9 +71,9 @@ export interface IConfigSync {
    * Columns to sync
    */
   columns: IColumn[];
-}
+};
 
-export interface IConfig {
+export type IConfig = {
   /**
    * The airtable API key to use. If not specified the .env api key will be used
    */
@@ -143,14 +143,14 @@ export interface IConfig {
    * Syncs to perform
    */
   syncs: IConfigSync[];
-}
+};
 
 /**
  * A flattened row of results from a query
  */
-export interface IQueryResult {
+export type IQueryResult = {
   [index: string]: any;
-}
+};
 
 export interface IDatabase {
   /**
