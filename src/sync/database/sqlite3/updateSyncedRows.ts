@@ -2,7 +2,7 @@ import SyncRowClass from "src/classes/SyncRow.class";
 import * as SQlite from "better-sqlite3";
 
 // tslint:disable-next-line
-const cleanForSql = (str: string): string => str.replace(/[^a-zA-Z_]/g, "");
+const cleanForSql = (str: string): string => str.replace(/[^a-zA-Z_0-9]/g, "");
 
 export default async (sqlite: any, syncRow: SyncRowClass): Promise<void> => {
   const tableName: string = cleanForSql(syncRow.localTable);

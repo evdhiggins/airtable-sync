@@ -3,7 +3,7 @@ import { IQueryResult } from "src/types";
 import Sync from "../../../classes/Sync.class";
 
 // tslint:disable-next-line
-const cleanForSql = (str: string): string => str.replace(/[^a-zA-Z_]/g, "");
+const cleanForSql = (str: string): string => str.replace(/[^a-zA-Z_0-9]/g, "");
 
 export default async (sqlite: any, sync: Sync): Promise<IQueryResult[]> => {
   const selectColumns: string[] = sync.columns.map((column) =>
@@ -24,7 +24,6 @@ export default async (sqlite: any, sync: Sync): Promise<IQueryResult[]> => {
   let sql: string = `SELECT ${selectColumns.join(
     ", ",
   )} FROM ${tableName} WHERE ${syncColumnName} = ?`;
-
   const stmt: any = (sqlite as SQlite).prepare(sql);
   const rows: IQueryResult[] = stmt.all([sync.syncFlag.true]);
 
