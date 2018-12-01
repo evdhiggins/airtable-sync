@@ -19,18 +19,13 @@ export default async (table: Airtable.Table, syncRow: SyncRow) => {
     {},
   );
 
-  if (!syncRow.recordId) {
-    syncRow.recordId = await addRow(table, airtableData);
-    return syncRow;
-  }
-
   if (syncRow.airtableLookupByPrimaryKey) {
     const primaryKeyColumn: string = syncRow.columns.filter(
       (column) => column.localColumn === syncRow.localIdColumns.primaryKey,
     )[0].airtableColumn;
     const records: Airtable.Record[] = await table
       .select({
-        filterByFormula: `{${primaryKeyColumn}} = ${syncRow.primaryKey}`,
+        filterByFormula: `{${primaryKeyColumn}} = "${syncRow.primaryKey}"`,
         pageSize: 1,
       })
       .firstPage();
@@ -40,6 +35,12 @@ export default async (table: Airtable.Table, syncRow: SyncRow) => {
       syncRow.recordId = records[0].getId();
       return syncRow;
     }
+  }
+
+  if (!syncRow.recordId) {
+    syncRow.recordId = await addRow(table, airtableData);
+
+    return syncRow;
   }
 
   // attempt to update an existing row

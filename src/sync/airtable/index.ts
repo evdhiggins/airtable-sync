@@ -8,7 +8,7 @@ async function update(syncRow: SyncRow): Promise<SyncRow> {
   }).base(syncRow.airtableBaseId)(syncRow.airtableTableId);
 
   // updateAirtable mutates the syncRow object, adding the record id if a valid one doesn't exist
-  updateAirtable(table, syncRow);
+  await updateAirtable(table, syncRow);
   return syncRow;
 }
 
