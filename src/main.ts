@@ -23,6 +23,9 @@ export default async (): Promise<void> => {
 
   const config: IConfig = configInitializers.loadConfig(configPath);
   const syncs: Sync[] = configInitializers.processConfig(config);
+
+  console.log(`${syncs.length} syncs found`);
+
   const syncRows: SyncRow[] = await syncs.reduce(
     async (accPromise: Promise<SyncRow[]>, sync: Sync) => {
       const acc: SyncRow[] = await accPromise;
@@ -39,15 +42,21 @@ export default async (): Promise<void> => {
     Promise.resolve([]),
   );
 
+  console.log(`Processing ${syncRows.length} syncRows`);
+
   // tslint:disable-next-line
   for (let i in Object.keys(syncRows)) {
-    airtable.update(syncRows[i]).then((syncRow) => {
+    console.log(
+      `${syncRows[i].localTable}: Airtable update: ${syncRows[i].primaryKey}`,
+    );
+    airtable.update(syncRows[i]).then(async (syncRow) => {
+      console.log(`${syncRow.localTable}: Local update: ${syncRow.recordId}`);
       syncRow.database.updateSyncedRows(syncRow);
     });
 
-    // wait 500 miliseconds between each call to avoid ever hitting the 5 calls / second api limit
-    // each airtable update call might call the Airtable api up to 2x,
-    // meaning the max call rate is limited to 4x / second
-    await wait(500);
+    // wait 650 miliseconds between each call to avoid ever hitting the 5 calls / second api limit
+    // each airtable update call might call the Airtable api up to 3x,
+    // meaning the max call rate is limited to ~4.6x / second
+    await wait(650);
   }
 };
