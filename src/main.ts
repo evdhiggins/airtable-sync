@@ -1,6 +1,6 @@
 require("dotenv").config();
 import src from "./sync";
-import { IConfig, IDatabase, IQueryResult } from "./types";
+import { IConfig, IDatabase, IQueryResult, IColumn } from "./types";
 import { PathLike } from "fs";
 import { resolve } from "path";
 import Sync from "./classes/Sync.class";
@@ -49,6 +49,17 @@ export default async (): Promise<void> => {
     console.log(
       `${syncRows[i].localTable}: Airtable update: ${syncRows[i].primaryKey}`,
     );
+
+    // tslint:disable-next-line
+    for (let c in syncRows[i].columns) {
+      const column: IColumn = syncRows[i].columns[c];
+      if (column.linkedColumn) {
+        syncRows[i].columns[c] = await syncRows[i].database.fetchLinkedRecords(
+          column,
+        );
+      }
+    }
+
     airtable.update(syncRows[i]).then(async (syncRow) => {
       console.log(`${syncRow.localTable}: Local update: ${syncRow.recordId}`);
       syncRow.database.updateSyncedRows(syncRow);

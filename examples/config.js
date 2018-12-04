@@ -18,6 +18,8 @@ exports.config = {
     false: "F",
   },
 
+  airtableLookupByPrimaryKey: false,
+
   syncs: [
     {
       localTable: "Table_name",

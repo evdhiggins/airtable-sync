@@ -1,7 +1,7 @@
 import Sync from "./classes/Sync.class";
 import SyncRow from "./classes/SyncRow.class";
 
-export type IColumn = {
+export interface IColumn {
   /**
    * The column name in the local table
    */
@@ -22,7 +22,32 @@ export type IColumn = {
    * @param cell The column value returned from the local table query
    */
   prepare?: (cell: any) => any;
-};
+
+  /**
+   * Flags column as LinkedColumn
+   */
+  linkedColumn?: true;
+
+  /**
+   * The local table name for the linked record. Used ot lookup the locally saved record ID
+   */
+  linkedTableName?: string;
+
+  /**
+   * The local table column name for the linked record. Used to find the correct record ids
+   */
+  linkedColumnName?: string;
+
+  /**
+   * The local table column name for the airtable record id in the linked table.
+   */
+  linkedRecordId?: string;
+
+  /**
+   * If Airtable column allows multiple linked records. If set to `True`, the column value & uploaded value are treated as arrays.
+   */
+  multipleRecords?: boolean;
+}
 
 export type IConfigSync = {
   /**
@@ -158,6 +183,13 @@ export interface IDatabase {
    * @param localQuery
    */
   fetchRowsToSync(sync: Sync): Promise<IQueryResult[]>;
+
+  /**
+   * Fetch all airtable record ID's for an array of linked columns
+   * If no record id is found no value is returned for the respective linkedColumn
+   * @param linkedColumns
+   */
+  fetchLinkedRecords(linkedColumn: IColumn): Promise<IColumn>;
 
   /**
    * Update all synced rows, adding Airtable record ID's and updating flags
