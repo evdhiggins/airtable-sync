@@ -197,3 +197,61 @@ export interface IDatabase {
    */
   updateSyncedRows(syncRow: SyncRow): Promise<void>;
 }
+
+export type AirtableConfig = {
+  apiKey?: string;
+  baseId?: string;
+  tableId?: string;
+};
+
+export type DatabaseConfig = {
+  name: "sqlite3";
+  options: {
+    [index: string]: any;
+  };
+};
+
+export type Config = {
+  airtable: AirtableConfig;
+  database: DatabaseConfig;
+};
+
+export type Column = {
+  databaseColumn: string;
+  airtableColumn: string;
+  prepare?: (cell: any) => any;
+  linkedColumn?: true;
+  linkedTableName?: string;
+  multipleRecords?: boolean;
+};
+
+export type Schema = {
+  database: {
+    tableName: string;
+    syncFlag: {
+      columnName: string;
+      true: boolean | number | string;
+      false: boolean | number | string;
+    };
+    idColumns: {
+      database: string;
+      airtable: string;
+    };
+  };
+
+  airtable: {
+    tableId?: string;
+    baseId?: string;
+    apiKey?: string;
+    lookupByPrimaryKey?: true;
+  };
+
+  columns: Column[];
+};
+
+export interface ISyncMaster {
+  addSync(schema: Schema): this;
+  config(): Config;
+  setConfig(config: Config): this;
+  run(): Promise<this>;
+}

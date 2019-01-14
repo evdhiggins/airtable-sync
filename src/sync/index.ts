@@ -1,9 +1,9 @@
 import airtable from "./airtable";
-import configInitializers from "./configInitializers";
 import getDatabase from "./database";
+import createSync from "./createSync";
 
 export default {
   airtable,
-  configInitializers,
-  getDatabase,
+  createSync,
+  getDatabase
 };
