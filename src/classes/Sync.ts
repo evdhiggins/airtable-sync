@@ -13,13 +13,13 @@ function sleep(miliseconds: number): Promise<any> {
 }
 
 export class Sync implements ISync {
-  private local: LocalSchema;
-  private airtable: AirtableSchema;
-  private columns: Column[];
-  private db: IDatabase;
-  private at: AirtableSync;
+  private _local: LocalSchema;
+  private _airtable: AirtableSchema;
+  private _columns: Column[];
+  private _db: IDatabase;
+  private _at: AirtableSync;
 
-  private rows: SyncRow[];
+  private _rows: SyncRow[];
 
   /**
    * Create a new sync from a user's schema. If there are any issues
@@ -31,7 +31,7 @@ export class Sync implements ISync {
   constructor(schema: ISchema, config: Config) {
     assertionTester("schema", "airtableSchema", schema.airtable);
 
-    this.airtable = {
+    this._airtable = {
       tableId: schema.airtable.tableId || config.airtable.tableId,
       baseId: schema.airtable.baseId || config.airtable.baseId,
       apiKey: schema.airtable.apiKey || config.airtable.apiKey,
@@ -40,7 +40,7 @@ export class Sync implements ISync {
 
     // verify AirtableSchema / AirtableConfig inputs
     ["apiKey", "baseId", "tableId"].forEach(key =>
-      assertionTester("schema", key, this.airtable[key])
+      assertionTester("schema", key, this._airtable[key])
     );
 
     // verify LocalSchema inputs
@@ -49,9 +49,9 @@ export class Sync implements ISync {
       assertionTester("schema", key, schema.local[key])
     );
 
-    this.local = schema.local;
-    this.columns = schema.columns;
-    this.rows = [];
+    this._local = schema.local;
+    this._columns = schema.columns;
+    this._rows = [];
   }
 
   /**
@@ -60,7 +60,7 @@ export class Sync implements ISync {
    * @param db
    */
   public setDatabase(db: IDatabase): this {
-    this.db = db;
+    this._db = db;
     return this;
   }
 
@@ -70,7 +70,7 @@ export class Sync implements ISync {
    * @param at
    */
   public setAirtable(at: any): this {
-    this.at = at;
+    this._at = at;
     return this;
   }
 
@@ -79,8 +79,8 @@ export class Sync implements ISync {
    */
   public async run(): Promise<void> {
     await this.getLocalData();
-    for (let row of this.rows) {
-      this.at.update(row).then(() => this.updateLocalDb(row));
+    for (let row of this._rows) {
+      this._at.update(row).then(() => this.updateLocalDb(row));
 
       // wait 650 miliseconds between each call to avoid ever hitting the 5 calls / second api limit
       // each airtable update call might call the Airtable api up to 3x,
@@ -90,21 +90,21 @@ export class Sync implements ISync {
   }
 
   private async getLocalData(): Promise<this> {
-    const rows: QueryResult[] = await this.db.getRowsToSync(
-      this.local,
-      this.columns
+    const rows: QueryResult[] = await this._db.getRowsToSync(
+      this._local,
+      this._columns
     );
     const schema: ISchema = {
-      airtable: this.airtable,
-      local: this.local,
-      columns: this.columns
+      airtable: this._airtable,
+      local: this._local,
+      columns: this._columns
     };
-    this.rows = rows.map(row => SycnRowFactory(row, schema, this.db));
+    this._rows = rows.map(row => SycnRowFactory(row, schema, this._db));
     return this;
   }
 
   private async updateLocalDb(row: any): Promise<this> {
-    await this.db.updateSyncedRow(this.local, row);
+    await this._db.updateSyncedRow(this._local, row);
     return this;
   }
 }

@@ -9,24 +9,24 @@ export class SyncRow implements ISyncRow {
   private _airtableRow: QueryResult;
   private _localId: string;
   private _lookupByLocalId: string;
-  private columns: SyncColumn[];
-  private row: QueryResult;
-  private schema: ISchema;
-  private db: IDatabase;
+  private _columns: SyncColumn[];
+  private _row: QueryResult;
+  private _schema: ISchema;
+  private _db: IDatabase;
 
   constructor(row: QueryResult, schema: ISchema, db: IDatabase) {
     this._airtableId = row[schema.local.idColumns.airtable];
     this._localId = row[schema.local.idColumns.local];
-    this.columns = this.prepareColumns(schema.columns);
-    this.row = row;
-    this.schema = schema;
-    this.db = db;
+    this._columns = this.prepareColumns(schema.columns);
+    this._row = row;
+    this._schema = schema;
+    this._db = db;
 
     const lookupColumn: Column = schema.columns.find(
       column => column.localColumn === schema.local.idColumns.local
     );
 
-    if (this.schema.airtable.lookupByPrimaryKey) {
+    if (this._schema.airtable.lookupByPrimaryKey) {
       this._lookupByLocalId = lookupColumn ? lookupColumn.airtableColumn : "";
     } else {
       this._lookupByLocalId = "";
@@ -45,14 +45,14 @@ export class SyncRow implements ISyncRow {
    */
   public setAirtableId(id: string): void {
     this._airtableId = id;
-    this.row[this.schema.local.idColumns.airtable] = id;
+    this._row[this._schema.local.idColumns.airtable] = id;
   }
 
   /**
    * Get the AirtableConfig for the SyncRow's sync
    */
   public airtableConfig(): AirtableConfig {
-    const { apiKey, baseId, tableId } = this.schema.airtable;
+    const { apiKey, baseId, tableId } = this._schema.airtable;
     return { apiKey, baseId, tableId };
   }
 
@@ -69,16 +69,16 @@ export class SyncRow implements ISyncRow {
 
   private prepareColumns(columns: Column[]): SyncColumn[] {
     return columns.map(c => {
-      const column: SyncColumn = SyncColumnFactory(c, this.row[c.localColumn]);
+      const column: SyncColumn = SyncColumnFactory(c, this._row[c.localColumn]);
       return column;
     });
   }
 
   private async prepareAirtableRow(): Promise<void> {
     this._airtableRow = {};
-    for (const column of this.columns) {
+    for (const column of this._columns) {
       if (column.isLinked()) {
-        const linkValues: any[] = await this.db.fetchLinkedRecords(
+        const linkValues: any[] = await this._db.fetchLinkedRecords(
           column.linkedColumnDetails(),
           column.airtableValue()
         );
