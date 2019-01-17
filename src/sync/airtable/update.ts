@@ -1,57 +1,50 @@
-import { IQueryResult } from "../../types";
-import SyncRow from "../../classes/SyncRow.class";
+import { QueryResult } from "../../types";
+import { SyncRow } from "../../classes/SyncRow.class";
 import Airtable = require("Airtable");
 
 async function addRow(
   table: Airtable.Table,
-  airtableData: IQueryResult,
+  airtableData: QueryResult,
 ): Promise<string> {
   const record: Airtable.Record = await table.create(airtableData);
   return record.getId();
 }
 
 export default async (table: Airtable.Table, syncRow: SyncRow) => {
-  const airtableData: IQueryResult = syncRow.columns.reduce(
-    (acc: IQueryResult, column) => {
-      acc[column.airtableColumn] = column.value;
-      return acc;
-    },
-    {},
-  );
+  const airtableData: QueryResult = syncRow.airtableRow();
+  const localIdLookup: string = syncRow.lookupByLocalId();
 
-  if (syncRow.airtableLookupByPrimaryKey) {
-    const primaryKeyColumn: string = syncRow.columns.filter(
-      (column) => column.localColumn === syncRow.localIdColumns.primaryKey,
-    )[0].airtableColumn;
+  if (localIdLookup) {
     const records: Airtable.Record[] = await table
       .select({
-        filterByFormula: `{${primaryKeyColumn}} = "${syncRow.primaryKey}"`,
+        filterByFormula: `{${localIdLookup}} = "${syncRow.localId()}"`,
         pageSize: 1,
       })
       .firstPage();
 
     if (records[0]) {
       await table.update(records[0].getId(), airtableData);
-      syncRow.recordId = records[0].getId();
-      return syncRow;
+      syncRow.setAirtableId(records[0].getId());
+      return;
     }
   }
 
-  if (!syncRow.recordId) {
-    syncRow.recordId = await addRow(table, airtableData);
+  if (!syncRow.airtableId()) {
+    const id: string = await addRow(table, airtableData);
+    syncRow.setAirtableId(id);
 
-    return syncRow;
+    return;
   }
 
-  // attempt to update an existing row
   try {
-    await table.update(syncRow.recordId, airtableData);
-    return syncRow;
+    // attempt to update an existing row
+    await table.update(syncRow.airtableId(), airtableData);
   } catch (e) {
     // if the item's record id is not found, add a new row and acquire new record id
     if (/not *found/i.test(e.message)) {
-      syncRow.recordId = await addRow(table, airtableData);
-      return syncRow;
+      const id: string = await addRow(table, airtableData);
+      syncRow.setAirtableId(id);
+      return;
     }
     throw e;
   }

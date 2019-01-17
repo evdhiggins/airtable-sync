@@ -1,91 +1,7 @@
-import { IConfig, IQueryResult, IConfigSync } from "../types";
-import SyncClass from "../classes/Sync.class";
-import SyncRowClass from "../classes/SyncRow.class";
+import { QueryResult, Column } from "../types";
+import { LocalSchema } from "../interfaces/ISchema";
 
-export const IFullConfigSyncMock: IConfigSync = {
-  localTable: "test_tb",
-  airtableApiKey: "key",
-  airtableBaseId: "base",
-  airtableTableId: "table",
-  databaseClass: "sqlite3",
-  databaseOptions: {
-    path: "./path/to/db",
-  },
-  localIdColumns: {
-    recordId: "record_id",
-    primaryKey: "id",
-  },
-  syncFlag: {
-    columnName: "sync_flag",
-    true: "T",
-    false: "F",
-  },
-  columns: [
-    {
-      airtableColumn: "Column one",
-      localColumn: "column_one",
-    },
-    {
-      airtableColumn: "Column two",
-      localColumn: "column_two",
-    },
-    {
-      airtableColumn: "Column three",
-      localColumn: "column_three",
-    },
-    {
-      airtableColumn: "ID",
-      localColumn: "id",
-    },
-  ],
-};
-
-export const IPartialConfigSyncMock: IConfigSync = {
-  localTable: "table_name",
-  localIdColumns: {
-    recordId: "record_id",
-    primaryKey: "id",
-  },
-  syncFlag: {
-    columnName: "sync_flag",
-    true: "T",
-    false: "F",
-  },
-  columns: [
-    {
-      airtableColumn: "Column one",
-      localColumn: "column_one",
-    },
-    {
-      airtableColumn: "Column two",
-      localColumn: "column_two",
-    },
-    {
-      airtableColumn: "Column three",
-      localColumn: "column_three",
-    },
-  ],
-};
-
-export const IConfigMock: IConfig = {
-  airtableApiKey: "apiTestValueKey",
-  airtableBaseId: "appTestValueBase",
-  airtableTableId: "tblTableId",
-  databaseClass: "sqlite3",
-  databaseOptions: {},
-  localIdColumns: {
-    recordId: "record_id",
-    primaryKey: "id",
-  },
-  syncFlag: {
-    columnName: "flag",
-    true: "T",
-    false: "F",
-  },
-  syncs: [IPartialConfigSyncMock],
-};
-
-export const IQueryResultMock: IQueryResult[] = [
+export const QueryResultMock: QueryResult[] = [
   {
     id: 1,
     column_one: "foo",
@@ -109,9 +25,42 @@ export const IQueryResultMock: IQueryResult[] = [
   },
 ];
 
-export const SyncClassMock: SyncClass = new SyncClass(IFullConfigSyncMock);
-export const SyncRowClassMock: SyncRowClass = new SyncRowClass(
-  SyncClassMock,
-  null,
-  IQueryResultMock[0],
-);
+export const localSchemaMock: LocalSchema = {
+  tableName: "test_tb",
+  syncFlag: {
+    columnName: "sync_flag",
+    true: "T",
+    false: "F",
+  },
+  idColumns: {
+    local: "id",
+    airtable: "record_id",
+  },
+};
+
+export const columnsMock: Column[] = [
+  {
+    airtableColumn: "Column one",
+    localColumn: "column_one",
+  },
+  {
+    airtableColumn: "Column two",
+    localColumn: "column_two",
+  },
+  {
+    airtableColumn: "Column three",
+    localColumn: "column_three",
+  },
+  {
+    airtableColumn: "ID",
+    localColumn: "id",
+  },
+];
+
+export const rowMock: any = {
+  id: 1,
+  column_one: "foo",
+  column_two: "bar",
+  column_three: "baz",
+  record_id: "rec1231",
+};

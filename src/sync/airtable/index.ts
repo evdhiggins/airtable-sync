@@ -1,15 +1,15 @@
 import Airtable = require("Airtable");
-import SyncRow from "../../classes/SyncRow.class";
+import IAirtable from "../../interfaces/IAirtable";
 import updateAirtable from "./update";
+import { SyncRow } from "../../classes/SyncRow.class";
 
-async function update(syncRow: SyncRow): Promise<SyncRow> {
-  const table: Airtable.Table = new Airtable({
-    apiKey: syncRow.airtableApiKey,
-  }).base(syncRow.airtableBaseId)(syncRow.airtableTableId);
+export default class implements IAirtable {
+  async update(row: SyncRow): Promise<void> {
+    const { apiKey, baseId, tableId } = row.airtableConfig();
+    const table: Airtable.Table = new Airtable({
+      apiKey,
+    }).base(baseId)(tableId);
 
-  // updateAirtable mutates the syncRow object, adding the record id if a valid one doesn't exist
-  await updateAirtable(table, syncRow);
-  return syncRow;
+    await updateAirtable(table, row);
+  }
 }
-
-export default { update };

@@ -1,7 +1,7 @@
 require("jest");
 import getRowsToSync from "./fetchRowsToSync";
-import { SyncClassMock } from "../../../tests/mocks";
-import { IQueryResult } from "src/types";
+import { localSchemaMock, columnsMock } from "../../../tests/mocks";
+import { QueryResult } from "../../../types";
 import * as Sqlite from "better-sqlite3";
 
 const sqlite: Sqlite = new Sqlite("./db", { memory: true });
@@ -15,7 +15,11 @@ sqlite.exec(
 describe("sqlite3 getRowsToSync: It should... ", () => {
   test("Return an empty array when no rows exist", async () => {
     expect.assertions(2);
-    const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
+    const result: QueryResult[] = await getRowsToSync(
+      sqlite,
+      localSchemaMock,
+      columnsMock,
+    );
     expect(Array.isArray(result)).toBe(true);
     expect(result.length).toBe(0);
   });
@@ -37,7 +41,11 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
       sqlite.exec(
         "INSERT INTO test_tb VALUES (2,'foo2', 'bar2', 'foobar2', 'F', NULL);",
       );
-      const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
+      const result: QueryResult[] = await getRowsToSync(
+        sqlite,
+        localSchemaMock,
+        columnsMock,
+      );
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBe(0);
     });
@@ -53,31 +61,43 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
       sqlite.exec(
         "INSERT INTO test_tb VALUES (2,'foo2', 'bar2', 'foobar2', 'T', NULL);",
       );
-      const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
+      const result: QueryResult[] = await getRowsToSync(
+        sqlite,
+        localSchemaMock,
+        columnsMock,
+      );
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBe(2);
     });
 
-    test("All columns specified in config", async () => {
-      expect.assertions(SyncClassMock.columns.length);
+    test("All columns specified in schema", async () => {
+      expect.assertions(columnsMock.length);
       sqlite.exec(
         "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
       );
 
-      const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
-      SyncClassMock.columns.forEach((column) => {
+      const result: QueryResult[] = await getRowsToSync(
+        sqlite,
+        localSchemaMock,
+        columnsMock,
+      );
+      columnsMock.forEach((column) => {
         expect(result[0][column.localColumn]).toBeDefined();
       });
     });
 
-    test("ID column", async () => {
+    test("Local ID column", async () => {
       expect.assertions(1);
       sqlite.exec(
         "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
       );
 
-      const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
-      expect(result[0][SyncClassMock.localIdColumns.primaryKey]).toBeDefined();
+      const result: QueryResult[] = await getRowsToSync(
+        sqlite,
+        localSchemaMock,
+        columnsMock,
+      );
+      expect(result[0][localSchemaMock.idColumns.local]).toBeDefined();
     });
     test("Airtable ID column", async () => {
       expect.assertions(1);
@@ -85,8 +105,12 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
         "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
       );
 
-      const result: IQueryResult[] = await getRowsToSync(sqlite, SyncClassMock);
-      expect(result[0][SyncClassMock.localIdColumns.recordId]).toBeDefined();
+      const result: QueryResult[] = await getRowsToSync(
+        sqlite,
+        localSchemaMock,
+        columnsMock,
+      );
+      expect(result[0][localSchemaMock.idColumns.airtable]).toBeDefined();
     });
   });
 });

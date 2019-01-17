@@ -1,6 +1,6 @@
 require("jest");
 import updateSyncedRows from "./updateSyncedRows";
-import { SyncRowClassMock } from "../../../tests/mocks";
+import { rowMock, localSchemaMock } from "../../../tests/mocks";
 import * as Sqlite from "better-sqlite3";
 
 const sqlite: Sqlite = new Sqlite("./db", { memory: true });
@@ -26,22 +26,22 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
 
     test("Sync flag", async () => {
       expect.assertions(1);
-      await updateSyncedRows(sqlite, SyncRowClassMock);
+      await updateSyncedRows(sqlite, localSchemaMock, rowMock);
       const row: QueryResult = sqlite
         .prepare("SELECT * FROM test_tb WHERE id=1")
         .get();
-      expect(row[SyncRowClassMock.syncFlag.columnName]).toBe(
-        SyncRowClassMock.syncFlag.false,
+      expect(row[localSchemaMock.syncFlag.columnName]).toBe(
+        localSchemaMock.syncFlag.false,
       );
     });
     test("Airtable ID", async () => {
       expect.assertions(1);
-      await updateSyncedRows(sqlite, SyncRowClassMock);
+      await updateSyncedRows(sqlite, localSchemaMock, rowMock);
       const row: QueryResult = sqlite
         .prepare("SELECT * FROM test_tb WHERE id=1")
         .get();
-      expect(row[SyncRowClassMock.localIdColumns.recordId]).toBe(
-        SyncRowClassMock.recordId,
+      expect(row[localSchemaMock.idColumns.airtable]).toBe(
+        rowMock[localSchemaMock.idColumns.airtable],
       );
     });
   });
@@ -62,7 +62,7 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
 
     test("Non-sync data fields", async () => {
       expect.assertions(3);
-      await updateSyncedRows(sqlite, SyncRowClassMock);
+      await updateSyncedRows(sqlite, localSchemaMock, rowMock);
       const row: QueryResult = sqlite
         .prepare("SELECT * FROM test_tb WHERE id=1")
         .get();
@@ -73,7 +73,7 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
 
     test("Other rows", async () => {
       expect.assertions(4);
-      await updateSyncedRows(sqlite, SyncRowClassMock);
+      await updateSyncedRows(sqlite, localSchemaMock, rowMock);
       const row2: QueryResult = sqlite
         .prepare("SELECT * FROM test_tb WHERE id=2")
         .get();
@@ -81,10 +81,10 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
         .prepare("SELECT * FROM test_tb WHERE id=3")
         .get();
 
-      expect(row2[SyncRowClassMock.localIdColumns.recordId]).toBe(null);
-      expect(row2[SyncRowClassMock.syncFlag.columnName]).toBe("T");
-      expect(row3[SyncRowClassMock.localIdColumns.recordId]).toBe(null);
-      expect(row3[SyncRowClassMock.syncFlag.columnName]).toBe("T");
+      expect(row2[localSchemaMock.idColumns.airtable]).toBe(null);
+      expect(row2[localSchemaMock.syncFlag.columnName]).toBe("T");
+      expect(row3[localSchemaMock.idColumns.airtable]).toBe(null);
+      expect(row3[localSchemaMock.syncFlag.columnName]).toBe("T");
     });
   });
 });

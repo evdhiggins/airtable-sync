@@ -1,39 +1,106 @@
-import { IColumn, IDatabase, IQueryResult, IConfigSync } from "src/types";
-import SyncBase from "./SyncBase.class";
-import Sync from "./Sync.class";
+import ISyncRow from "../interfaces/ISyncRow";
+import { QueryResult, Column, AirtableConfig } from "../types";
+import ISchema from "../interfaces/ISchema";
+import IDatabase from "../interfaces/IDatabase";
+import SyncColumnFactory, { SyncColumn } from "./SyncColumn.class";
 
-export default class extends SyncBase {
+export class SyncRow implements ISyncRow {
+  private _airtableId: string;
+  private _airtableRow: QueryResult;
+  private _localId: string;
+  private _lookupByLocalId: string;
+  private columns: SyncColumn[];
+  private row: QueryResult;
+  private schema: ISchema;
+  private db: IDatabase;
+
+  constructor(row: QueryResult, schema: ISchema, db: IDatabase) {
+    this._airtableId = row[schema.local.idColumns.airtable];
+    this._localId = row[schema.local.idColumns.local];
+    this.columns = this.prepareColumns(schema.columns);
+    this.row = row;
+    this.schema = schema;
+    this.db = db;
+
+    const lookupColumn: Column = schema.columns.find(
+      (column) => column.localColumn === schema.local.idColumns.local,
+    );
+
+    if (this.schema.airtable.lookupByPrimaryKey) {
+      this._lookupByLocalId = lookupColumn ? lookupColumn.airtableColumn : "";
+    } else {
+      this._lookupByLocalId = "";
+    }
+  }
+
   /**
-   * The airtable row (record) id value
+   * Returns the SyncRow's airtable id
    */
-  public recordId: string;
+  public airtableId(): string {
+    return this._airtableId;
+  }
 
   /**
-   * The local datastore primary key value
+   * Sets the SyncRow's airtable id
    */
-  public primaryKey: number | string;
+  public setAirtableId(id: string): void {
+    this._airtableId = id;
+    this.row[this.schema.local.idColumns.airtable] = id;
+  }
 
-  constructor(sync: Sync, database: IDatabase, row: IQueryResult) {
-    super((sync as unknown) as IConfigSync);
-    this.database = database;
-    this.recordId = row[sync.localIdColumns.recordId];
-    this.primaryKey = row[sync.localIdColumns.primaryKey];
+  /**
+   * Get the AirtableConfig for the SyncRow's sync
+   */
+  public airtableConfig(): AirtableConfig {
+    const { apiKey, baseId, tableId } = this.schema.airtable;
+    return { apiKey, baseId, tableId };
+  }
 
-    // airtableLookup is only true if configured and primaryKey is included in synced columns
-    this.airtableLookupByPrimaryKey =
-      sync.airtableLookupByPrimaryKey &&
-      sync.columns.filter(
-        (column) => column.localColumn === sync.localIdColumns.primaryKey,
-      ).length > 0;
+  /**
+   * Returns the SyncRow's local id
+   */
+  public localId(): string {
+    return this._localId;
+  }
 
-    // perform specified manipulations on values prior to assigning them to column objects
-    this.columns = sync.columns.map((c) => {
-      const column: IColumn = Object.assign({}, c);
-      column.value =
-        typeof column.prepare === "function"
-          ? column.prepare(row[column.localColumn])
-          : row[column.localColumn];
+  public lookupByLocalId(): string {
+    return this._lookupByLocalId || "";
+  }
+
+  private prepareColumns(columns: Column[]): SyncColumn[] {
+    return columns.map((c) => {
+      const column: SyncColumn = SyncColumnFactory(c, this.row[c.localColumn]);
       return column;
     });
   }
+
+  private async prepareAirtableRow(): Promise<void> {
+    this._airtableRow = {};
+    for (const column of this.columns) {
+      if (column.isLinked()) {
+        const linkValues: any[] = await this.db.fetchLinkedRecords(
+          column.linkedColumnDetails(),
+          column.airtableValue(),
+        );
+        column.setValue(linkValues);
+      }
+
+      this._airtableRow[column.airtableColumn()] = column.airtableValue();
+    }
+  }
+
+  public async airtableRow(): Promise<QueryResult> {
+    if (!this._airtableRow) {
+      await this.prepareAirtableRow();
+    }
+    return this._airtableRow;
+  }
+}
+
+export default function(
+  row: QueryResult,
+  schema: ISchema,
+  db: IDatabase,
+): SyncRow {
+  return new SyncRow(row, schema, db);
 }

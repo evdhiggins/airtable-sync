@@ -1,28 +1,46 @@
 import * as SQlite from "better-sqlite3";
-import { IQueryResult, IColumn } from "src/types";
+import { QueryResult } from "../../../types";
+import { SyncColumn } from "../../../classes/SyncColumn.class";
+import { LinkedColumnDetails } from "../../../interfaces/ISyncColumn";
 
 // tslint:disable-next-line
 const cleanForSql = (str: string): string => str.replace(/[^a-zA-Z_0-9]/g, "");
 
-export default async (sqlite: any, column: IColumn): Promise<IColumn> => {
+export default async (
+  sqlite: any,
+  linkDetails: LinkedColumnDetails,
+  columnValue: any,
+): Promise<any[]> => {
   let params: string[] = [];
-  if (column.multipleRecords && Array.isArray(column.value)) {
-    params = column.value;
+
+  // get all linked record details
+  const {
+    multipleRecords,
+    tableName,
+    lookupColumn,
+    returnColumn,
+  } = linkDetails;
+
+  // wrap lookup values in an array
+  if (multipleRecords && Array.isArray(columnValue)) {
+    params = columnValue;
   } else {
-    params = [column.value];
+    params = [columnValue];
   }
+
+  // prepare query
   const placeholders: string = params.map(() => "?").join(",");
   const sql: string = `
 SELECT
-    ${cleanForSql(column.linkedRecordId)}
+    ${cleanForSql(returnColumn)}
 
-  FROM ${cleanForSql(column.linkedTableName)}
-  WHERE ${cleanForSql(column.linkedColumnName)} IN
+  FROM ${cleanForSql(tableName)}
+  WHERE ${cleanForSql(lookupColumn)} IN
     (${placeholders})
-    AND ${cleanForSql(column.linkedRecordId)} IS NOT NULL;
+    AND ${cleanForSql(returnColumn)} IS NOT NULL;
     `;
-  const rows: IQueryResult[] = (sqlite as SQlite).prepare(sql).all(params);
-  return Object.assign({}, column, {
-    value: rows.map((row) => row[column.linkedRecordId]),
-  });
+
+  // run query
+  const rows: QueryResult[] = (sqlite as SQlite).prepare(sql).all(params);
+  return rows.map((row) => row[returnColumn]);
 };

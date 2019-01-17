@@ -1,11 +1,13 @@
 import * as SQLite from "better-sqlite3";
 import fetchRowsToSync from "./fetchRowsToSync";
 import updateSyncedRow from "./updateSyncedRows";
-import { IDatabase, IQueryResult, IColumn } from "../../../types";
-
-import Sync from "../../../classes/Sync.class";
-import SyncRow from "../../../classes/SyncRow.class";
 import fetchLinkedRecords from "./fetchLinkedRecords";
+
+import { QueryResult, Column } from "../../../types";
+import { LocalSchema } from "../../../interfaces/ISchema";
+import IDatabase from "../../../interfaces/IDatabase";
+import { SyncColumn } from "../../../classes/SyncColumn.class";
+import { LinkedColumnDetails } from "../../../interfaces/ISyncColumn";
 
 export default class implements IDatabase {
   private sqlite: SQLite;
@@ -13,15 +15,26 @@ export default class implements IDatabase {
     this.sqlite = new SQLite(options.path, options);
   }
 
-  public async fetchRowsToSync(sync: Sync): Promise<IQueryResult[]> {
-    return await fetchRowsToSync(this.sqlite, sync);
+  public async getRowsToSync(
+    schema: LocalSchema,
+    columns: Column[],
+  ): Promise<QueryResult[]> {
+    return await fetchRowsToSync(this.sqlite, schema, columns);
   }
 
-  public async fetchLinkedRecords(column: IColumn): Promise<IColumn> {
-    return await fetchLinkedRecords(this.sqlite, column);
+  public async fetchLinkedRecords(
+    linkDetails: LinkedColumnDetails,
+    value: any,
+  ): Promise<any[]> {
+    const values: any[] = await fetchLinkedRecords(
+      this.sqlite,
+      linkDetails,
+      value,
+    );
+    return values;
   }
 
-  public async updateSyncedRows(syncRow: SyncRow): Promise<void> {
-    return await updateSyncedRow(this.sqlite, syncRow);
+  public async updateSyncedRow(schema: LocalSchema, row: any): Promise<void> {
+    return await updateSyncedRow(this.sqlite, schema, row);
   }
 }
