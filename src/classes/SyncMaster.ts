@@ -6,7 +6,7 @@ import IDatabase from "../interfaces/IDatabase";
 import { AirtableSync } from "./AirtableSync";
 import DatabaseFactory from "../databases";
 
-export default class SyncMaster implements ISyncMaster {
+export class SyncMaster implements ISyncMaster {
   private _config: Config;
   private _syncs: Sync[] = [];
 
@@ -48,4 +48,8 @@ export default class SyncMaster implements ISyncMaster {
       handleError(e);
     }
   }
+}
+
+export default function(config: Config): SyncMaster {
+  return new SyncMaster(config);
 }
