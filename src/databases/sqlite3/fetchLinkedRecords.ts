@@ -1,7 +1,6 @@
 import * as SQlite from "better-sqlite3";
-import { QueryResult } from "../../../types";
-import { SyncColumn } from "../../../classes/SyncColumn.class";
-import { LinkedColumnDetails } from "../../../interfaces/ISyncColumn";
+import { QueryResult } from "../../types";
+import { LinkedColumnDetails } from "../../interfaces/ISyncColumn";
 
 // tslint:disable-next-line
 const cleanForSql = (str: string): string => str.replace(/[^a-zA-Z_0-9]/g, "");
@@ -9,7 +8,7 @@ const cleanForSql = (str: string): string => str.replace(/[^a-zA-Z_0-9]/g, "");
 export default async (
   sqlite: any,
   linkDetails: LinkedColumnDetails,
-  columnValue: any,
+  columnValue: any
 ): Promise<any[]> => {
   let params: string[] = [];
 
@@ -18,7 +17,7 @@ export default async (
     multipleRecords,
     tableName,
     lookupColumn,
-    returnColumn,
+    returnColumn
   } = linkDetails;
 
   // wrap lookup values in an array
@@ -42,5 +41,5 @@ SELECT
 
   // run query
   const rows: QueryResult[] = (sqlite as SQlite).prepare(sql).all(params);
-  return rows.map((row) => row[returnColumn]);
+  return rows.map(row => row[returnColumn]);
 };

@@ -1,3 +1,3 @@
-import SyncMasterClass from "./classes/SyncMaster.class";
+import SyncMasterClass from "./classes/SyncMaster";
 
 export = SyncMasterClass;

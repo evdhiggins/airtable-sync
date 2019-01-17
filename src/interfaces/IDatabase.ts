@@ -1,6 +1,5 @@
 import { QueryResult, Column } from "../types";
 import { LocalSchema } from "./ISchema";
-import { SyncColumn } from "../classes/SyncColumn.class";
 import { LinkedColumnDetails } from "./ISyncColumn";
 
 export default interface IDatabase {
@@ -16,7 +15,7 @@ export default interface IDatabase {
    */
   fetchLinkedRecords(
     linkDetails: LinkedColumnDetails,
-    value: any,
+    value: any
   ): Promise<any[]>;
 
   /**

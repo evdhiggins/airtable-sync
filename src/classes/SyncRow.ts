@@ -2,7 +2,7 @@ import ISyncRow from "../interfaces/ISyncRow";
 import { QueryResult, Column, AirtableConfig } from "../types";
 import ISchema from "../interfaces/ISchema";
 import IDatabase from "../interfaces/IDatabase";
-import SyncColumnFactory, { SyncColumn } from "./SyncColumn.class";
+import SyncColumnFactory, { SyncColumn } from "./SyncColumn";
 
 export class SyncRow implements ISyncRow {
   private _airtableId: string;
@@ -23,7 +23,7 @@ export class SyncRow implements ISyncRow {
     this.db = db;
 
     const lookupColumn: Column = schema.columns.find(
-      (column) => column.localColumn === schema.local.idColumns.local,
+      column => column.localColumn === schema.local.idColumns.local
     );
 
     if (this.schema.airtable.lookupByPrimaryKey) {
@@ -68,7 +68,7 @@ export class SyncRow implements ISyncRow {
   }
 
   private prepareColumns(columns: Column[]): SyncColumn[] {
-    return columns.map((c) => {
+    return columns.map(c => {
       const column: SyncColumn = SyncColumnFactory(c, this.row[c.localColumn]);
       return column;
     });
@@ -80,7 +80,7 @@ export class SyncRow implements ISyncRow {
       if (column.isLinked()) {
         const linkValues: any[] = await this.db.fetchLinkedRecords(
           column.linkedColumnDetails(),
-          column.airtableValue(),
+          column.airtableValue()
         );
         column.setValue(linkValues);
       }
@@ -100,7 +100,7 @@ export class SyncRow implements ISyncRow {
 export default function(
   row: QueryResult,
   schema: ISchema,
-  db: IDatabase,
+  db: IDatabase
 ): SyncRow {
   return new SyncRow(row, schema, db);
 }

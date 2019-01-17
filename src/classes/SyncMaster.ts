@@ -1,10 +1,10 @@
 import { ISyncMaster, Config } from "../types";
-import src from "./../sync";
-import SyncFactory, { Sync } from "./Sync.class";
+import SyncFactory, { Sync } from "./Sync";
 import ISchema from "../interfaces/ISchema";
 import handleError from "../handleError";
 import IDatabase from "../interfaces/IDatabase";
-const { airtable, getDatabase } = src;
+import { AirtableSync } from "./AirtableSync";
+import DatabaseFactory from "../databases";
 
 export default class SyncMaster implements ISyncMaster {
   private _config: Config;
@@ -18,8 +18,8 @@ export default class SyncMaster implements ISyncMaster {
     try {
       const sync: Sync = SyncFactory(schema, this._config);
       const { name, options } = this._config.database;
-      const Database: any = getDatabase(name);
-      const db: IDatabase = new Database(options);
+      const db: IDatabase = DatabaseFactory(name, options);
+      const airtable: AirtableSync = new AirtableSync();
       sync.setDatabase(db);
       sync.setAirtable(airtable);
       this._syncs.push(sync);

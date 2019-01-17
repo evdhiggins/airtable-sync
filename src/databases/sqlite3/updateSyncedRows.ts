@@ -1,5 +1,5 @@
 import * as SQlite from "better-sqlite3";
-import { LocalSchema } from "../../../interfaces/ISchema";
+import { LocalSchema } from "../../interfaces/ISchema";
 
 // tslint:disable-next-line
 const cleanForSql = (str: string): string => str.replace(/[^a-zA-Z_0-9]/g, "");
@@ -7,7 +7,7 @@ const cleanForSql = (str: string): string => str.replace(/[^a-zA-Z_0-9]/g, "");
 export default async (
   sqlite: any,
   schema: LocalSchema,
-  row: any,
+  row: any
 ): Promise<void> => {
   const tableName: string = cleanForSql(schema.tableName);
   const syncColumnName: string = cleanForSql(schema.syncFlag.columnName);

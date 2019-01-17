@@ -1,7 +1,7 @@
 require("jest");
 import getLinkedRecords from "./fetchLinkedRecords";
 import * as Sqlite from "better-sqlite3";
-import { LinkedColumnDetails } from "../../../interfaces/ISyncColumn";
+import { LinkedColumnDetails } from "../../interfaces/ISyncColumn";
 
 const sqlite: Sqlite = new Sqlite("./db", { memory: true });
 
@@ -9,7 +9,7 @@ const linkDetailsMock: LinkedColumnDetails = {
   tableName: "orders",
   lookupColumn: "id",
   returnColumn: "record_id",
-  multipleRecords: true,
+  multipleRecords: true
 };
 
 const valueMock: any = [1234, 1235, 1236];
@@ -17,7 +17,7 @@ const valueMock: any = [1234, 1235, 1236];
 // create in-memory table for tests
 sqlite.exec(
   // tslint:disable-next-line
-  "CREATE TABLE orders (id INTEGER, record_id VARCHAR(17))",
+  "CREATE TABLE orders (id INTEGER, record_id VARCHAR(17))"
 );
 
 describe("sqlite3 fetchLinkedRecords: It should... ", () => {
@@ -26,7 +26,7 @@ describe("sqlite3 fetchLinkedRecords: It should... ", () => {
     const linkedValues: any[] = await getLinkedRecords(
       sqlite,
       linkDetailsMock,
-      valueMock,
+      valueMock
     );
     expect(linkedValues).toBeDefined();
     expect(Array.isArray(linkedValues)).toBe(true);
@@ -46,7 +46,7 @@ describe("sqlite3 fetchLinkedRecords: It should... ", () => {
       const linkedValues: any[] = await getLinkedRecords(
         sqlite,
         linkDetailsMock,
-        valueMock,
+        valueMock
       );
       expect(linkedValues.length).toBe(0);
     });
@@ -59,7 +59,7 @@ describe("sqlite3 fetchLinkedRecords: It should... ", () => {
       const linkedValues: any[] = await getLinkedRecords(
         sqlite,
         linkDetailsMock,
-        valueMock,
+        valueMock
       );
       expect(linkedValues.length).toBe(2);
       expect(linkedValues).toContain("rec1");

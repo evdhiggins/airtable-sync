@@ -3,11 +3,10 @@ import fetchRowsToSync from "./fetchRowsToSync";
 import updateSyncedRow from "./updateSyncedRows";
 import fetchLinkedRecords from "./fetchLinkedRecords";
 
-import { QueryResult, Column } from "../../../types";
-import { LocalSchema } from "../../../interfaces/ISchema";
-import IDatabase from "../../../interfaces/IDatabase";
-import { SyncColumn } from "../../../classes/SyncColumn.class";
-import { LinkedColumnDetails } from "../../../interfaces/ISyncColumn";
+import { QueryResult, Column } from "../../types";
+import { LocalSchema } from "../../interfaces/ISchema";
+import IDatabase from "../../interfaces/IDatabase";
+import { LinkedColumnDetails } from "../../interfaces/ISyncColumn";
 
 export default class implements IDatabase {
   private sqlite: SQLite;
@@ -17,19 +16,19 @@ export default class implements IDatabase {
 
   public async getRowsToSync(
     schema: LocalSchema,
-    columns: Column[],
+    columns: Column[]
   ): Promise<QueryResult[]> {
     return await fetchRowsToSync(this.sqlite, schema, columns);
   }
 
   public async fetchLinkedRecords(
     linkDetails: LinkedColumnDetails,
-    value: any,
+    value: any
   ): Promise<any[]> {
     const values: any[] = await fetchLinkedRecords(
       this.sqlite,
       linkDetails,
-      value,
+      value
     );
     return values;
   }

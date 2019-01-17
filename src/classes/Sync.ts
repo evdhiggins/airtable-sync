@@ -3,11 +3,11 @@ import ISync from "../interfaces/ISync";
 import assertionTester from "../assertionTester";
 import ISchema, { LocalSchema, AirtableSchema } from "../interfaces/ISchema";
 import IDatabase from "../interfaces/IDatabase";
-import IAirtable from "../interfaces/IAirtable";
-import SycnRowFactory, { SyncRow } from "./SyncRow.class";
+import SycnRowFactory, { SyncRow } from "./SyncRow";
+import { AirtableSync } from "./AirtableSync";
 
 function sleep(miliseconds: number): Promise<any> {
-  return new Promise((res) => {
+  return new Promise(res => {
     setTimeout(() => res(), miliseconds);
   });
 }
@@ -17,7 +17,7 @@ export class Sync implements ISync {
   private airtable: AirtableSchema;
   private columns: Column[];
   private db: IDatabase;
-  private at: IAirtable;
+  private at: AirtableSync;
 
   private rows: SyncRow[];
 
@@ -35,18 +35,18 @@ export class Sync implements ISync {
       tableId: schema.airtable.tableId || config.airtable.tableId,
       baseId: schema.airtable.baseId || config.airtable.baseId,
       apiKey: schema.airtable.apiKey || config.airtable.apiKey,
-      lookupByPrimaryKey: schema.airtable.lookupByPrimaryKey === true,
+      lookupByPrimaryKey: schema.airtable.lookupByPrimaryKey === true
     };
 
     // verify AirtableSchema / AirtableConfig inputs
-    ["apiKey", "baseId", "tableId"].forEach((key) =>
-      assertionTester("schema", key, this.airtable[key]),
+    ["apiKey", "baseId", "tableId"].forEach(key =>
+      assertionTester("schema", key, this.airtable[key])
     );
 
     // verify LocalSchema inputs
     assertionTester("schema", "localSchema", schema.local);
-    ["tableName", "syncFlag", "idColumns"].forEach((key) =>
-      assertionTester("schema", key, schema.local[key]),
+    ["tableName", "syncFlag", "idColumns"].forEach(key =>
+      assertionTester("schema", key, schema.local[key])
     );
 
     this.local = schema.local;
@@ -92,14 +92,14 @@ export class Sync implements ISync {
   private async getLocalData(): Promise<this> {
     const rows: QueryResult[] = await this.db.getRowsToSync(
       this.local,
-      this.columns,
+      this.columns
     );
     const schema: ISchema = {
       airtable: this.airtable,
       local: this.local,
-      columns: this.columns,
+      columns: this.columns
     };
-    this.rows = rows.map((row) => SycnRowFactory(row, schema, this.db));
+    this.rows = rows.map(row => SycnRowFactory(row, schema, this.db));
     return this;
   }
 
