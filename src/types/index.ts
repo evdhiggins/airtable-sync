@@ -1,4 +1,5 @@
-import ISchema from "./interfaces/ISchema";
+import ISchema from "../interfaces/ISchema";
+import { Column } from "./Column";
 
 /**
  * A row of results from a query
@@ -25,21 +26,11 @@ export type Config = {
   database: DatabaseConfig;
 };
 
-export type Column = {
-  localColumn: string;
-  airtableColumn: string;
-  prepare?: (cell: any) => any;
-  linkedColumn?: boolean;
-  linkedTableName?: string;
-  linkedLookupColumn?: string;
-  linkedReturnColumn?: string;
-  multipleRecords?: boolean;
-  value?: any;
-};
-
 export interface ISyncMaster {
   addSync(schema: ISchema): this;
   config(): Config;
   setConfig(config: Config): this;
   run(): Promise<void>;
 }
+
+export type Column = Column;

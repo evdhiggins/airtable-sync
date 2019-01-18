@@ -1,5 +1,17 @@
 import IAssertionTests from "../interfaces/IAssertionTests";
 
+export type Column = {
+  localColumn: string;
+  airtableColumn: string;
+  prepare?: (cell: any) => any;
+  linkedColumn?: boolean;
+  linkedTableName?: string;
+  linkedLookupColumn?: string;
+  linkedReturnColumn?: string;
+  multipleRecords?: boolean;
+  value?: any;
+};
+
 export const ColumnAssertions: IAssertionTests = {
   localColumn: {
     assertion(value: string): string {
