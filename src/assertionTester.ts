@@ -1,12 +1,14 @@
 import assert = require("assert");
 import IAssertionTests from "./interfaces/IAssertionTests";
 import { ISchemaAssertions as schema } from "./interfaces/ISchema";
+import { ColumnAssertions as column } from "./types/Column";
 
 type Tests = {
   [index: string]: IAssertionTests;
 };
 
 const tests: Tests = {
+  column,
   schema
 };
 

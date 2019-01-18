@@ -1,5 +1,7 @@
 import { Column } from "../types";
 import { IColumn, LinkedColumnDetails } from "../interfaces/ISyncColumn";
+import assertionTester from "../assertionTester";
+import assert = require("assert");
 
 export class SyncColumn implements IColumn {
   private _localColumn: string;
@@ -8,19 +10,53 @@ export class SyncColumn implements IColumn {
   private _linkedColumn?: boolean;
   private _linkedColumnDetails?: LinkedColumnDetails;
 
-  private prepare?: (value: any) => any;
+  private _prepare?: (value: any) => any;
 
   constructor(column: Column, value: any) {
+    // verify base-level column values
+    type ColumnBaseKeys =
+      | "localColumn"
+      | "airtableColumn"
+      | "linkedColumn"
+      | "prepare";
+    ["localColumn", "airtableColumn", "linkedColumn", "prepare"].forEach(
+      (key: ColumnBaseKeys) => assertionTester("column", key, column[key])
+    );
     this._localColumn = column.localColumn;
     this._airtableColumn = column.airtableColumn;
+    this._prepare = column.prepare;
     this._linkedColumn = column.linkedColumn;
+
+    // verify `value` input
+    assert(
+      typeof value !== "undefined",
+      `Column ( ${column.localColumn} / ${
+        column.airtableColumn
+      } )value cannot be undefined`
+    );
     this._value = value;
 
+    if (column.linkedColumn) {
+      // verify linkedColumnDetails
+      type LinkedColumnKeys =
+        | "linkedTableName"
+        | "linkedLookupColumn"
+        | "linkedReturnColumn"
+        | "multipleRecords";
+      [
+        "linkedTableName",
+        "linkedLookupColumn",
+        "linkedReturnColumn",
+        "multipleRecords"
+      ].forEach((key: LinkedColumnKeys) =>
+        assertionTester("column", key, column[key])
+      );
+    }
     this._linkedColumnDetails = {
-      tableName: column.linkedTableName,
-      lookupColumn: column.linkedLookupColumn,
-      returnColumn: column.linkedReturnColumn,
-      multipleRecords: column.multipleRecords,
+      tableName: column.linkedTableName || "",
+      lookupColumn: column.linkedLookupColumn || "",
+      returnColumn: column.linkedReturnColumn || "",
+      multipleRecords: column.multipleRecords === true
     };
   }
 
@@ -29,14 +65,14 @@ export class SyncColumn implements IColumn {
   }
 
   public airtableValue(): any {
-    if (typeof this.prepare === "function") {
+    if (typeof this._prepare === "function") {
       try {
-        return this.prepare(this._value);
+        return this._prepare(this._value);
       } catch (err) {
         console.warn(
           `Prepare function failed in column [ ${this._localColumn} / ${
             this._airtableColumn
-          } ]:`,
+          } ]:`
         );
         console.warn(err.message);
       }
