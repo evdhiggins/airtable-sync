@@ -12,6 +12,23 @@ export class AirtableSync implements IAirtable {
     return record.getId();
   }
 
+  public async delete(row: SyncRow): Promise<Airtable.RecordData> {
+    const { apiKey, baseId, tableId } = row.airtableConfig();
+    const table: Airtable.Table = new Airtable({
+      apiKey
+    }).base(baseId)(tableId);
+    try {
+      const deletedRecord: Airtable.Record = await table.destroy(
+        row.airtableId()
+      );
+      return deletedRecord.fields;
+    } catch (err) {
+      console.warn("Error deleting row: ");
+      console.warn(err.message);
+      return {};
+    }
+  }
+
   public async update(row: SyncRow): Promise<void> {
     const { apiKey, baseId, tableId } = row.airtableConfig();
     const table: Airtable.Table = new Airtable({

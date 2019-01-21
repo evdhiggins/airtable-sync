@@ -1,5 +1,5 @@
 import Airtable = require("Airtable");
-import { AirtableConfig } from "../types";
+import { AirtableConfig, QueryResult } from "../types";
 
 export default interface ISyncRow {
   airtableId(): string;
@@ -7,5 +7,6 @@ export default interface ISyncRow {
   airtableRow(): Airtable.RecordData;
   airtableConfig(): AirtableConfig;
   localId(): string;
+  localRow(): QueryResult;
   lookupByLocalId(): string;
 }

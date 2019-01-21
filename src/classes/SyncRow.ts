@@ -63,6 +63,16 @@ export class SyncRow implements ISyncRow {
     return this._localId;
   }
 
+  public localRow(): QueryResult {
+    return this._columns.reduce(
+      (acc, column) => {
+        acc[column.localColumn()] = this._row[column.localColumn()];
+        return acc;
+      },
+      {} as QueryResult
+    );
+  }
+
   public lookupByLocalId(): string {
     return this._lookupByLocalId || "";
   }

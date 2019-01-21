@@ -81,6 +81,10 @@ export class SyncColumn implements IColumn {
     this._value = value;
   }
 
+  public localColumn(): string {
+    return this._localColumn;
+  }
+
   public isLinked(): boolean {
     return this._linkedColumn === true;
   }

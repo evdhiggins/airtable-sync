@@ -1,7 +1,11 @@
 import { Config, Column, QueryResult, SyncRunReport } from "../types";
 import ISync from "../interfaces/ISync";
 import assertionTester from "../assertionTester";
-import ISchema, { LocalSchema, AirtableSchema } from "../interfaces/ISchema";
+import ISchema, {
+  LocalSchema,
+  AirtableSchema,
+  Filter
+} from "../interfaces/ISchema";
 import IDatabase from "../interfaces/IDatabase";
 import SycnRowFactory, { SyncRow } from "./SyncRow";
 import { AirtableSync } from "./AirtableSync";
@@ -12,6 +16,20 @@ function sleep(miliseconds: number): Promise<any> {
   });
 }
 
+interface IPreparedFilter extends Filter {
+  removeFromAirtable: boolean;
+  skipSync: boolean;
+  actions: Filter.ActionFunction[];
+  match: Filter.MatchFunction;
+}
+
+type FilterResult = {
+  removeFromAirtable: boolean;
+  skipSync: boolean;
+  actions: Filter.ActionFunction[];
+  removeFromAirtableCallbacks: Filter.RemoveFromAirtableCallback[];
+};
+
 export class Sync implements ISync {
   private _local: LocalSchema;
   private _airtable: AirtableSchema;
@@ -19,6 +37,7 @@ export class Sync implements ISync {
   private _db: IDatabase;
   private _at: AirtableSync;
   private _name: string;
+  private _filters: IPreparedFilter[];
 
   private _rows: SyncRow[];
 
@@ -51,6 +70,17 @@ export class Sync implements ISync {
     assertionTester("schema", "idColumns", schema.local.idColumns);
 
     this._local = schema.local;
+
+    if (schema.filters) {
+      assertionTester("schema", "filters", schema.filters);
+      schema.filters.forEach(filter =>
+        assertionTester("schema", "filter", filter)
+      );
+      this._filters = this.prepareFilters(schema.filters);
+    } else {
+      this._filters = [];
+    }
+
     this._columns = schema.columns;
     this._rows = [];
     this._name = schema.name;
@@ -82,7 +112,21 @@ export class Sync implements ISync {
   public async run(): Promise<SyncRunReport> {
     await this.getLocalData();
     for (let row of this._rows) {
-      this._at.update(row).then(() => this.updateLocalDb(row));
+      const filterResults: FilterResult = this.evaluateFilters(row);
+
+      if (!filterResults.skipSync) {
+        this._at.update(row).then(() => this.updateLocalDb(row));
+      }
+
+      if (filterResults.removeFromAirtable) {
+        this._at.delete(row).then(deletedRow => {
+          filterResults.removeFromAirtableCallbacks.forEach(fn =>
+            fn(deletedRow)
+          );
+        });
+      }
+
+      filterResults.actions.forEach(fn => fn(row.localRow()));
 
       // wait 650 miliseconds between each call to avoid ever hitting the 5 calls / second api limit
       // each airtable update call might call the Airtable api up to 3x,
@@ -95,6 +139,95 @@ export class Sync implements ISync {
       name,
       rows: this._rows.length
     };
+  }
+
+  private evaluateFilters(row: SyncRow): FilterResult {
+    const rowData: QueryResult = row.localRow();
+    const result: FilterResult = {
+      removeFromAirtable: false,
+      skipSync: false,
+      removeFromAirtableCallbacks: [],
+      actions: []
+    };
+    this._filters.forEach(filter => {
+      if (filter.match(rowData)) {
+        // a row will be removed if ANY filters match and require removal
+        result.removeFromAirtable =
+          filter.removeFromAirtable || result.removeFromAirtable;
+
+        // a row will not be synced if ANY filters match and require no sync
+        result.skipSync = filter.skipSync || result.skipSync;
+
+        // all matching remove callbacks will be called
+        if (filter.removeFromAirtableCallback) {
+          result.removeFromAirtableCallbacks.push(
+            filter.removeFromAirtableCallback
+          );
+        }
+
+        // all matching actions will be called
+        result.actions = result.actions.concat(filter.actions);
+      }
+    });
+    return result;
+  }
+
+  private prepareFilters(filters: Filter[]): IPreparedFilter[] {
+    return filters.reduce(
+      (acc, filter) => {
+        const prepFilter: any = Object.assign({}, filter);
+
+        // generate a matchFnFactory that will be passed the current
+        // value of filter.match and will return a function that accepts
+        // the filter value
+        let matchFnFactory: any;
+        let stringMatch: boolean = false;
+        if (filter.match instanceof RegExp) {
+          matchFnFactory = (reg: RegExp) => (v: string) => reg.test(v);
+          stringMatch = true;
+        } else if (typeof filter.match === "string") {
+          matchFnFactory = (matchStr: string) => (v: string) => matchStr === v;
+          stringMatch = true;
+        } else {
+          matchFnFactory = (fn: any) => fn;
+        }
+        const matchFunc: any = matchFnFactory(filter.match);
+
+        // assign to the final filter.match value a function that receives
+        // the full QueryResult row, evaluates if the column is available,
+        // and calls the generated matchFunc with the column / row
+        prepFilter.match = (row: QueryResult) => {
+          if (filter.type === "column") {
+            const value: string = row[filter.localColumn];
+            if (typeof value === "undefined") {
+              // warn user if match column doesn't exist in data
+              console.warn(
+                `Filter column (${filter.localColumn}) not found in row:`
+              );
+              console.warn(row);
+
+              // return match = `false` if specified column doesn't exist
+              return false;
+            }
+            return matchFunc(row[filter.localColumn]);
+          }
+          return matchFunc(stringMatch ? JSON.stringify(row) : row);
+        };
+
+        prepFilter.removeFromAirtable = prepFilter.actions.includes(
+          "removeFromAirtable"
+        );
+        prepFilter.skipSync =
+          prepFilter.actions.includes("skipSync") ||
+          prepFilter.removeFromAirtable;
+        prepFilter.actions = prepFilter.actions.filter(
+          (f: Filter.Action) => typeof f === "function"
+        );
+        acc.push(prepFilter as IPreparedFilter);
+        return acc;
+      },
+      [] as IPreparedFilter[]
+    );
   }
 
   private async getLocalData(): Promise<this> {
