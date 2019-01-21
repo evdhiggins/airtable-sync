@@ -40,15 +40,15 @@ export class Sync implements ISync {
     };
 
     // verify AirtableSchema / AirtableConfig inputs
-    ["apiKey", "baseId", "tableId"].forEach(key =>
-      assertionTester("schema", key, this._airtable[key])
-    );
+    assertionTester("schema", "apiKey", this._airtable.apiKey);
+    assertionTester("schema", "baseId", this._airtable.baseId);
+    assertionTester("schema", "tableId", this._airtable.tableId);
 
     // verify LocalSchema inputs
     assertionTester("schema", "localSchema", schema.local);
-    ["tableName", "syncFlag", "idColumns"].forEach(key =>
-      assertionTester("schema", key, schema.local[key])
-    );
+    assertionTester("schema", "tableName", schema.local.tableName);
+    assertionTester("schema", "syncFlag", schema.local.syncFlag);
+    assertionTester("schema", "idColumns", schema.local.idColumns);
 
     this._local = schema.local;
     this._columns = schema.columns;

@@ -14,14 +14,11 @@ export class SyncColumn implements IColumn {
 
   constructor(column: Column, value: any) {
     // verify base-level column values
-    type ColumnBaseKeys =
-      | "localColumn"
-      | "airtableColumn"
-      | "linkedColumn"
-      | "prepare";
-    ["localColumn", "airtableColumn", "linkedColumn", "prepare"].forEach(
-      (key: ColumnBaseKeys) => assertionTester("column", key, column[key])
-    );
+    assertionTester("column", "localColumn", column.localColumn);
+    assertionTester("column", "airtableColumn", column.airtableColumn);
+    assertionTester("column", "linkedColumn", column.linkedColumn);
+    assertionTester("column", "prepare", column.prepare);
+
     this._localColumn = column.localColumn;
     this._airtableColumn = column.airtableColumn;
     this._prepare = column.prepare;
@@ -38,20 +35,20 @@ export class SyncColumn implements IColumn {
 
     if (column.linkedColumn) {
       // verify linkedColumnDetails
-      type LinkedColumnKeys =
-        | "linkedTableName"
-        | "linkedLookupColumn"
-        | "linkedReturnColumn"
-        | "multipleRecords";
-      [
-        "linkedTableName",
+      assertionTester("column", "linkedTableName", column.linkedTableName);
+      assertionTester(
+        "column",
         "linkedLookupColumn",
-        "linkedReturnColumn",
-        "multipleRecords"
-      ].forEach((key: LinkedColumnKeys) =>
-        assertionTester("column", key, column[key])
+        column.linkedLookupColumn
       );
+      assertionTester(
+        "column",
+        "linkedReturnColumn",
+        column.linkedReturnColumn
+      );
+      assertionTester("column", "multipleRecords", column.multipleRecords);
     }
+
     this._linkedColumnDetails = {
       tableName: column.linkedTableName || "",
       lookupColumn: column.linkedLookupColumn || "",
