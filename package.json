@@ -1,6 +1,6 @@
 {
   "name": "airtable-sync",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "A one-way sync from a local datasource to Airtable",
   "main": "./built/main.js",
   "scripts": {
@@ -35,7 +35,6 @@
   },
   "dependencies": {
     "airtable": "^0.5.7",
-    "better-sqlite3": "^5.0.1",
-    "dotenv": "^6.1.0"
+    "better-sqlite3": "^5.0.1"
   }
 }
