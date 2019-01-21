@@ -17,10 +17,10 @@ export class SyncRow implements ISyncRow {
   constructor(row: QueryResult, schema: ISchema, db: IDatabase) {
     this._airtableId = row[schema.local.idColumns.airtable];
     this._localId = row[schema.local.idColumns.local];
-    this._columns = this.prepareColumns(schema.columns);
     this._row = row;
     this._schema = schema;
     this._db = db;
+    this._columns = this.prepareColumns(schema.columns);
 
     const lookupColumn: Column = schema.columns.find(
       column => column.localColumn === schema.local.idColumns.local

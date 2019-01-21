@@ -30,7 +30,12 @@ export interface ISyncMaster {
   addSync(schema: ISchema): this;
   config(): Config;
   setConfig(config: Config): this;
-  run(): Promise<void>;
+  run(): Promise<SyncRunReport[]>;
 }
+
+export type SyncRunReport = {
+  name: string;
+  rows: number;
+};
 
 export type Column = Column;

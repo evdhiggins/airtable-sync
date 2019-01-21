@@ -27,6 +27,7 @@ export default interface ISchema {
   airtable: AirtableSchema;
   local: LocalSchema;
   columns: Column[];
+  name?: string;
 }
 
 /**
@@ -39,20 +40,20 @@ export const ISchemaAssertions: IAssertionTests = {
       return typeof value === "object"
         ? ""
         : "AirtableSchema is required (`schema.airtable`)";
-    },
+    }
   },
   localSchema: {
     assertion(value: any): string {
       return typeof value === "object"
         ? ""
         : "LocalSchema is required (`schema.local`)";
-    },
+    }
   },
   tableName: {
     assertion(value: string): boolean {
       return typeof value !== "string" || value === "";
     },
-    errmsg: "`local.tableName` is required and must be type 'string'",
+    errmsg: "`local.tableName` is required and must be type 'string'"
   },
   syncFlag: {
     assertion(value: any): string {
@@ -64,7 +65,7 @@ export const ISchemaAssertions: IAssertionTests = {
         default:
           return "";
       }
-    },
+    }
   },
   idColumns: {
     assertion(value: { local: string; airtable: string }): string {
@@ -76,27 +77,27 @@ export const ISchemaAssertions: IAssertionTests = {
         case typeof value.airtable !== "string" || value.airtable === "":
           return "`local.idColumns.airtable` must be a non-empty string";
       }
-    },
+    }
   },
   tableId: {
     assertion(value: string): string {
       return /tbl\w{14}/.test(value)
         ? ""
         : "`airtable.tableId` is required. Table ID must be 17 characters long and start with 'tbl'";
-    },
+    }
   },
   baseId: {
     assertion(value: string): string {
       return /app\w{14}/.test(value)
         ? ""
         : "`airtable.baseId` is required. Base ID must be 17 characters long and start with 'app'";
-    },
+    }
   },
   apiKey: {
     assertion(value: string): string {
       return /key\w{14}/.test(value)
         ? ""
         : "`airtable.apiKey` is required. API key must be 17 characters long and start with 'key'";
-    },
-  },
+    }
+  }
 };

@@ -1,4 +1,4 @@
-import { ISyncMaster, Config } from "../types";
+import { ISyncMaster, Config, SyncRunReport } from "../types";
 import SyncFactory, { Sync } from "./Sync";
 import ISchema from "../interfaces/ISchema";
 import handleError from "../handleError";
@@ -38,15 +38,18 @@ export class SyncMaster implements ISyncMaster {
     return this._config;
   }
 
-  async run(): Promise<void> {
+  async run(): Promise<SyncRunReport[]> {
+    const syncResults: SyncRunReport[] = [];
     try {
       // a standard for-loop easily forces the syncs to be run synchronously
       for (const sync of this._syncs) {
-        await sync.run();
+        const result: any = await sync.run();
+        syncResults.push(result);
       }
     } catch (e) {
       handleError(e);
     }
+    return syncResults;
   }
 }
 

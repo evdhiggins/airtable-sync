@@ -1,4 +1,4 @@
-import { Config, Column, QueryResult } from "../types";
+import { Config, Column, QueryResult, SyncRunReport } from "../types";
 import ISync from "../interfaces/ISync";
 import assertionTester from "../assertionTester";
 import ISchema, { LocalSchema, AirtableSchema } from "../interfaces/ISchema";
@@ -18,6 +18,7 @@ export class Sync implements ISync {
   private _columns: Column[];
   private _db: IDatabase;
   private _at: AirtableSync;
+  private _name: string;
 
   private _rows: SyncRow[];
 
@@ -52,6 +53,7 @@ export class Sync implements ISync {
     this._local = schema.local;
     this._columns = schema.columns;
     this._rows = [];
+    this._name = schema.name;
   }
 
   /**
@@ -77,7 +79,7 @@ export class Sync implements ISync {
   /**
    * Performs the full sync
    */
-  public async run(): Promise<void> {
+  public async run(): Promise<SyncRunReport> {
     await this.getLocalData();
     for (let row of this._rows) {
       this._at.update(row).then(() => this.updateLocalDb(row));
@@ -87,6 +89,12 @@ export class Sync implements ISync {
       // meaning the max call rate is limited to ~4.6x / second
       await sleep(650);
     }
+    const name: string =
+      this._name || `${this._local.tableName} / ${this._airtable.tableId}`;
+    return {
+      name,
+      rows: this._rows.length
+    };
   }
 
   private async getLocalData(): Promise<this> {
