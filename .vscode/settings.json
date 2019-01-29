@@ -1,4 +1,6 @@
 {
   "prettier.arrowParens": "always",
-  "prettier.trailingComma": "all"
+  "prettier.trailingComma": "all",
+  "prettier.tslintIntegration": true,
+  "editor.formatOnSave": true
 }

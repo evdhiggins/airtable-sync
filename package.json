@@ -1,13 +1,13 @@
 {
-  "name": "airtable-sync",
-  "version": "1.0.0",
+  "name": "@evdhiggins/airtable-sync",
+  "version": "0.1.1",
   "description": "A one-way sync from a local datasource to Airtable",
   "main": "./built/main.js",
+  "types": "built/main.d.ts",
   "scripts": {
     "build": "npm run build:types && npm run build:src",
     "build:src": "npx tsc -p .",
     "build:types": "npx ttw deploy",
-    "start": "node ./main.js",
     "test": "npx jest",
     "tests": "npm run test"
   },
@@ -29,6 +29,7 @@
     "@types/better-sqlite3": "^3.1.3",
     "@types/jest": "^23.3.9",
     "@types/node": "^10.12.9",
+    "dotenv": "^6.2.0",
     "jest": "^23.6.0",
     "ts-jest": "^23.10.4",
     "typescript": "^3.1.6",
@@ -36,7 +37,6 @@
   },
   "dependencies": {
     "airtable": "^0.5.7",
-    "better-sqlite3": "^5.0.1",
-    "dotenv": "^6.1.0"
+    "better-sqlite3": "^5.0.1"
   }
 }

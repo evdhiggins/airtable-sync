@@ -9,7 +9,8 @@
     "paths": {
       "airtable": ["node_modules/airtable/lib/airtable.js"],
       "src/*": ["./src/*"]
-    }
+    },
+    "declaration": true
   },
   "include": ["./src/**/**/*"]
 }
