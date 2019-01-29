@@ -18,9 +18,8 @@ export class AirtableSync implements IAirtable {
       apiKey
     }).base(baseId)(tableId);
     try {
-      const deletedRecord: Airtable.Record = await table.destroy(
-        row.airtableId()
-      );
+      const deletedRecord: Airtable.Record = await table.find(row.airtableId());
+      await table.destroy(row.airtableId());
       return deletedRecord.fields;
     } catch (err) {
       console.warn("Error deleting row: ");
