@@ -220,6 +220,10 @@ declare namespace Airtable {
     getId(): string;
   }
 
+  type TypecastOption = {
+    typecast: boolean;
+  }
+
   interface Table {
     /**
      * Contains the table name or ID; whichever was used when initializing the table object.
@@ -245,8 +249,17 @@ declare namespace Airtable {
      */
     select(params: SelectParams): Query;
     create(recordData: RecordData): Promise<Record>;
+    create(recordData: RecordData, options: TypecastOption): Promise<Record>;
     create(recordData: RecordData, done: Callback): void;
+    create(recordData: RecordData, options: TypecastOption, done: Callback): void;
     update(recordId: string, recordData: RecordData): Promise<Record>;
+    update(recordId: string, recordData: RecordData, options: TypecastOption): Promise<Record>;
+    update(
+      recordId: string,
+      recordData: RecordData,
+      options: TypecastOption,
+      done: Callback,
+    ): Promise<Record>;
     update(
       recordId: string,
       recordData: RecordData,
@@ -255,6 +268,13 @@ declare namespace Airtable {
     destroy(recordId: string): Promise<Record>;
     destroy(recordId: string, done: Callback): Promise<Record> | void;
     replace(recordId: string, recordData: RecordData): void;
+    replace(recordId: string, recordData: RecordData, options: TypecastOption): void;
+    replace(
+      recordId: string,
+      recordData: RecordData,
+      options: TypecastOption,
+      done: Callback,
+    ): Promise<Record>;
     replace(
       recordId: string,
       recordData: RecordData,
