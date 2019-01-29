@@ -64,7 +64,7 @@ export class AirtableSync implements IAirtable {
       await table.update(row.airtableId(), airtableData);
     } catch (e) {
       // if the item's record id is not found, add a new row and acquire new record id
-      if (/not *found/i.test(e.message)) {
+      if (e.error === "NOT_FOUND") {
         const id: string = await this.addRow(table, airtableData);
         row.setAirtableId(id);
         return;
