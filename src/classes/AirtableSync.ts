@@ -34,7 +34,7 @@ export class AirtableSync implements IAirtable {
       apiKey
     }).base(baseId)(tableId);
 
-    const airtableData: QueryResult = row.airtableRow();
+    const airtableData: QueryResult = await row.airtableRow();
     const localIdLookup: string = row.lookupByLocalId();
 
     if (localIdLookup) {
