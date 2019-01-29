@@ -8,7 +8,9 @@ export class AirtableSync implements IAirtable {
     table: Airtable.Table,
     airtableData: QueryResult
   ): Promise<string> {
-    const record: Airtable.Record = await table.create(airtableData);
+    const record: Airtable.Record = await table.create(airtableData, {
+      typecast: true
+    });
     return record.getId();
   }
 
@@ -46,7 +48,9 @@ export class AirtableSync implements IAirtable {
         .firstPage();
 
       if (records[0]) {
-        await table.update(records[0].getId(), airtableData);
+        await table.update(records[0].getId(), airtableData, {
+          typecast: true
+        });
         row.setAirtableId(records[0].getId());
         return;
       }
@@ -61,7 +65,9 @@ export class AirtableSync implements IAirtable {
 
     try {
       // attempt to update an existing row
-      await table.update(row.airtableId(), airtableData);
+      await table.update(row.airtableId(), airtableData, {
+        typecast: true
+      });
     } catch (e) {
       // if the item's record id is not found, add a new row and acquire new record id
       if (e.error === "NOT_FOUND") {
