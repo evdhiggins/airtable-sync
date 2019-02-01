@@ -9,6 +9,7 @@ import ISchema, {
 import IDatabase from "../interfaces/IDatabase";
 import SycnRowFactory, { SyncRow } from "./SyncRow";
 import { AirtableSync } from "./AirtableSync";
+import Airtable = require("Airtable");
 
 function sleep(miliseconds: number): Promise<any> {
   return new Promise(res => {
@@ -115,18 +116,18 @@ export class Sync implements ISync {
       const filterResults: FilterResult = this.evaluateFilters(row);
 
       if (!filterResults.skipSync) {
-        this._at.update(row).then(() => this.updateLocalDb(row));
+        await this._at.update(row);
       }
 
       if (filterResults.removeFromAirtable) {
-        this._at.delete(row).then(deletedRow => {
-          filterResults.removeFromAirtableCallbacks.forEach(fn =>
-            fn(deletedRow)
-          );
-        });
+        const deletedRow: Airtable.RecordData = await this._at.delete(row);
+        filterResults.removeFromAirtableCallbacks.forEach(fn => fn(deletedRow));
       }
 
       filterResults.actions.forEach(fn => fn(row.localRow()));
+
+      // toggle sync flag in local db
+      await this.updateLocalDb(row);
 
       // wait 650 miliseconds between each call to avoid ever hitting the 5 calls / second api limit
       // each airtable update call might call the Airtable api up to 3x,
