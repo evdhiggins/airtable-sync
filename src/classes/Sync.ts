@@ -133,6 +133,9 @@ export class Sync implements ISync {
       // meaning the max call rate is limited to ~4.6x / second
       await sleep(650);
     }
+    // close open connection(s)
+    await this._db.close();
+
     const name: string =
       this._name || `${this._local.tableName} / ${this._airtable.tableId}`;
     return {

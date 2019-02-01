@@ -36,4 +36,8 @@ export default class implements IDatabase {
   public async updateSyncedRow(schema: LocalSchema, row: any): Promise<void> {
     return await updateSyncedRow(this.sqlite, schema, row);
   }
+
+  public async close(): Promise<void> {
+    this.sqlite.close();
+  }
 }

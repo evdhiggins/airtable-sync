@@ -23,4 +23,9 @@ export default interface IDatabase {
    * @param updateQuery
    */
   updateSyncedRow(schema: LocalSchema, row: any): Promise<void>;
+
+  /**
+   * Close all open connections
+   */
+  close(): Promise<void>;
 }
