@@ -6,5 +6,5 @@ export default function(err: Error): void {
   } else {
     console.error(err);
   }
-  process.exit();
+  throw err;
 }
