@@ -22,10 +22,12 @@ export class AirtableSync implements IAirtable {
     try {
       const deletedRecord: Airtable.Record = await table.find(row.airtableId());
       await table.destroy(row.airtableId());
+      row.setAirtableId(null);
       return deletedRecord.fields;
     } catch (err) {
       console.warn("Error deleting row: ");
       console.warn(err.message);
+      row.setAirtableId(null);
       return {};
     }
   }

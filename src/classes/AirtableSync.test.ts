@@ -167,12 +167,13 @@ describe("update", () => {
 describe("delete", () => {
   let deletedRow: Airtable.RecordData;
   let record: Airtable.Record;
+  let syncRow: SyncRow;
 
   beforeAll(async done => {
     // wait for 1 second to avoid hitting airtable API call limits
     setTimeout(async () => {
       record = await table.create({ ID: "asdf", Col1: "fdsa" });
-      const syncRow: SyncRow = syncRowMockFactory();
+      syncRow = syncRowMockFactory();
       syncRow.setAirtableId(record.getId());
       deletedRow = await airtableSync.delete(syncRow);
       done();
@@ -184,6 +185,10 @@ describe("delete", () => {
       expect(rec).toBeFalsy();
       done();
     });
+  });
+
+  test("Set the `SyncRow` airtable ID to `null`", () => {
+    expect(syncRow.airtableId()).toBe(null);
   });
 
   test("Return an object containing all Airtable row values", () => {
