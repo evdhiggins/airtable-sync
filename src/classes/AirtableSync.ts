@@ -58,27 +58,21 @@ export class AirtableSync implements IAirtable {
       }
     }
 
-    if (!row.airtableId()) {
-      const id: string = await this.addRow(table, airtableData);
-      row.setAirtableId(id);
-
-      return;
-    }
-
+    if (row.airtableId()) {
     try {
       // attempt to update an existing row
       await table.update(row.airtableId(), airtableData, {
-        typecast: true
+          typecast: true,
       });
-    } catch (e) {
-      // if the item's record id is not found, add a new row and acquire new record id
-      if (e.error === "NOT_FOUND") {
-        const id: string = await this.addRow(table, airtableData);
-        row.setAirtableId(id);
         return;
+      } catch (_) {
+        // create new row if update fails
       }
-      throw e;
     }
+
+    // create new airtable row
+    const id: string = await this.addRow(table, airtableData);
+    row.setAirtableId(id);
   }
 }
 
