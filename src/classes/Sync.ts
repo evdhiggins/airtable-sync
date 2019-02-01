@@ -247,8 +247,8 @@ export class Sync implements ISync {
     return this;
   }
 
-  private async updateLocalDb(row: any): Promise<this> {
-    await this._db.updateSyncedRow(this._local, row);
+  private async updateLocalDb(row: SyncRow): Promise<this> {
+    await this._db.updateSyncedRow(this._local, row.localRow());
     return this;
   }
 }

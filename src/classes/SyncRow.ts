@@ -64,13 +64,17 @@ export class SyncRow implements ISyncRow {
   }
 
   public localRow(): QueryResult {
-    return this._columns.reduce(
+    const row: QueryResult = this._columns.reduce(
       (acc, column) => {
         acc[column.localColumn()] = this._row[column.localColumn()];
         return acc;
       },
       {} as QueryResult
     );
+    row[this._schema.local.idColumns.local] = this.localId();
+    row[this._schema.local.idColumns.airtable] = this.airtableId();
+
+    return row;
   }
 
   public lookupByLocalId(): string {
