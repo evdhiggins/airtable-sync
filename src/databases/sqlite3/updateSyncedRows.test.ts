@@ -3,12 +3,14 @@ import updateSyncedRows from "./updateSyncedRows";
 import { rowMock, localSchemaMock } from "../../tests/mocks";
 import * as Sqlite from "better-sqlite3";
 
-const sqlite: Sqlite = new Sqlite("./db", { memory: true });
+const sqlite: Sqlite = new Sqlite("./updateSyncedRows.test.db", {
+  memory: true,
+});
 
 // create in-memory table for tests
 sqlite.exec(
   // tslint:disable-next-line
-  "CREATE TABLE test_tb (id INTEGER, column_one VARCHAR(15), column_two VARCHAR(15), column_three VARCHAR(15), sync_flag VARCHAR(1), record_id VARCHAR(15))"
+  "CREATE TABLE test_tb (id INTEGER, column_one VARCHAR(15), column_two VARCHAR(15), column_three VARCHAR(15), sync_flag VARCHAR(1), record_id VARCHAR(15))",
 );
 
 type QueryResult = {
@@ -20,7 +22,7 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
     beforeEach(() => {
       sqlite.exec("DELETE FROM test_tb");
       sqlite.exec(
-        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);"
+        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
       );
     });
 
@@ -31,7 +33,7 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
         .prepare("SELECT * FROM test_tb WHERE id=1")
         .get();
       expect(row[localSchemaMock.syncFlag.columnName]).toBe(
-        localSchemaMock.syncFlag.false
+        localSchemaMock.syncFlag.false,
       );
     });
     test("Airtable ID", async () => {
@@ -41,7 +43,7 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
         .prepare("SELECT * FROM test_tb WHERE id=1")
         .get();
       expect(row[localSchemaMock.idColumns.airtable]).toBe(
-        rowMock[localSchemaMock.idColumns.airtable]
+        rowMock[localSchemaMock.idColumns.airtable],
       );
     });
   });
@@ -50,13 +52,13 @@ describe("sqlite3 getRowsToSync: It should... ", () => {
     beforeEach(() => {
       sqlite.exec("DELETE FROM test_tb");
       sqlite.exec(
-        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);"
+        "INSERT INTO test_tb VALUES (1,'foo1', 'bar1', 'foobar1', 'T', NULL);",
       );
       sqlite.exec(
-        "INSERT INTO test_tb VALUES (2,'foo2', 'bar2', 'foobar2', 'T', NULL);"
+        "INSERT INTO test_tb VALUES (2,'foo2', 'bar2', 'foobar2', 'T', NULL);",
       );
       sqlite.exec(
-        "INSERT INTO test_tb VALUES (3,'foo3', 'bar3', 'foobar3', 'T', NULL);"
+        "INSERT INTO test_tb VALUES (3,'foo3', 'bar3', 'foobar3', 'T', NULL);",
       );
     });
 
