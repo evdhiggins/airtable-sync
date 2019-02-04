@@ -3,3 +3,5 @@ types/*
 .vscode/*
 tsconfig.json
 jest.config.js
+*.test.*
+built/tests/*
