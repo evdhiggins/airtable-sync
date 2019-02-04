@@ -8,10 +8,16 @@ export class AirtableSync implements IAirtable {
     table: Airtable.Table,
     airtableData: QueryResult
   ): Promise<string> {
+    try {
     const record: Airtable.Record = await table.create(airtableData, {
-      typecast: true
+        typecast: true,
     });
     return record.getId();
+    } catch (err) {
+      console.warn("Error adding row");
+      console.warn(err);
+      return null;
+  }
   }
 
   public async delete(row: SyncRow): Promise<Airtable.RecordData> {

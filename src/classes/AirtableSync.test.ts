@@ -121,6 +121,31 @@ describe("update", () => {
     expect(recordId).toMatch(/rec\w{14}/);
   });
 
+  test("Add an row if given a deleted record ID", async () => {
+    expect.assertions(2);
+
+    // create and delete airtable row
+    const record: Airtable.Record = await table.create({});
+    const deletedId: string = record.getId();
+    await table.destroy(deletedId);
+
+    await sleep(500);
+
+    // create instance of SyncRow
+    const syncRow: SyncRow = syncRowMockFactory();
+    syncRow.setAirtableId(deletedId);
+
+    // add the row to Airtable
+    await airtableSync.update(syncRow);
+
+    // extract the row ID
+    const recordId: string = syncRow.airtableId();
+    recordIds.push(recordId);
+
+    expect(recordId).not.toBe(deletedId);
+    expect(recordId).toMatch(/rec\w{14}/);
+  });
+
   test("Update a row in Airtable if given a valid record ID", async () => {
     expect.assertions(2);
 
