@@ -1,6 +1,6 @@
 {
   "name": "@evdhiggins/airtable-sync",
-  "version": "0.1.3",
+  "version": "0.1.5",
   "description": "A one-way sync from a local datasource to Airtable",
   "main": "./built/main.js",
   "types": "built/main.d.ts",
@@ -8,6 +8,7 @@
     "build": "npm run build:types && npm run build:src",
     "build:src": "npx tsc -p .",
     "build:types": "npx ttw deploy",
+    "publish:patch": "npm run build && npm version patch && npm publish",
     "test": "npx jest",
     "tests": "npm run test"
   },
