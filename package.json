@@ -1,6 +1,6 @@
 {
   "name": "@evdhiggins/airtable-sync",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A one-way sync from a local datasource to Airtable",
   "main": "./built/main.js",
   "types": "built/main.d.ts",

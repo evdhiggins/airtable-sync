@@ -47,6 +47,18 @@ export class AirtableSync implements IAirtable {
     const airtableData: QueryResult = await row.airtableRow();
     const localIdLookup: string = row.lookupByLocalId();
 
+    if (row.airtableId()) {
+      try {
+        // attempt to update an existing row
+        await table.update(row.airtableId(), airtableData, {
+          typecast: true,
+        });
+        return;
+      } catch (_) {
+        // lookup by id column or create new row if update fails
+      }
+    }
+
     if (localIdLookup) {
       const records: Airtable.Record[] = await table
         .select({
@@ -61,18 +73,6 @@ export class AirtableSync implements IAirtable {
         });
         row.setAirtableId(records[0].getId());
         return;
-      }
-    }
-
-    if (row.airtableId()) {
-    try {
-      // attempt to update an existing row
-      await table.update(row.airtableId(), airtableData, {
-          typecast: true,
-      });
-        return;
-      } catch (_) {
-        // create new row if update fails
       }
     }
 
