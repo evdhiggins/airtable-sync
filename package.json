@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "airtable": "^0.5.7",
-    "better-sqlite3": "^5.0.1"
+    "better-sqlite3": "^5.0.1",
+    "pg-promise": "^8.7.3"
   }
 }

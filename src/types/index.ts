@@ -15,7 +15,7 @@ export type AirtableConfig = {
 };
 
 export type DatabaseConfig = {
-  name: "sqlite3";
+  name: "sqlite3" | "postgresql";
   options: {
     [index: string]: any;
   };
