@@ -67,7 +67,7 @@ const schema: ISchema = {
   ]
 };
 
-const sqlite: Sqlite = new Sqlite(dbFilePath);
+const sqlite: Sqlite.Database = new Sqlite(dbFilePath);
 
 describe("airtable-sync action filter integration", () => {
   let syncRunReport: SyncRunReport;

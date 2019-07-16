@@ -29,7 +29,7 @@ export default async (
   let sql: string = `SELECT ${dbColumns.join(
     ", "
   )} FROM ${tableName} WHERE ${syncColumnName} = ?`;
-  const stmt: any = (sqlite as SQlite).prepare(sql);
+  const stmt: any = (sqlite as SQlite.Database).prepare(sql);
   const rows: QueryResult[] = stmt.all([schema.syncFlag.true]);
 
   return rows;

@@ -19,6 +19,6 @@ export default async (
 
   const sql: string = `UPDATE ${tableName} SET ${syncColumnName}=?, ${airtableIdColumnName}=? WHERE ${primaryKeyColumnName}=?;`;
 
-  const stmt: any = (sqlite as SQlite).prepare(sql);
+  const stmt: any = (sqlite as SQlite.Database).prepare(sql);
   stmt.run([schema.syncFlag.false, airtableId, localId]);
 };

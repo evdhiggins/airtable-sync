@@ -9,7 +9,7 @@ import IDatabase from "../../interfaces/IDatabase";
 import { LinkedColumnDetails } from "../../interfaces/ISyncColumn";
 
 export default class implements IDatabase {
-  private sqlite: SQLite;
+  private sqlite: SQLite.Database;
   constructor(options: any) {
     this.sqlite = new SQLite(options.path, options);
   }

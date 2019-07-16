@@ -67,7 +67,7 @@ const airtable: Airtable = new Airtable({ apiKey: process.env.API_KEY });
 const table: Airtable.Table = airtable.base(process.env.BASE_ID)(
   process.env.TABLE_ID
 );
-const sqlite: Sqlite = new Sqlite(dbFilePath);
+const sqlite: Sqlite.Database = new Sqlite(dbFilePath);
 
 describe("airtable-sync filter with delete match", () => {
   let syncRunReport: SyncRunReport;

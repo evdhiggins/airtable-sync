@@ -4,7 +4,7 @@ import { localSchemaMock, columnsMock } from "../../tests/mocks";
 import { QueryResult } from "../../types";
 import * as Sqlite from "better-sqlite3";
 
-const sqlite: Sqlite = new Sqlite("./fetchRowsToSync.test.db", { memory: true });
+const sqlite: Sqlite.Database = new Sqlite("./fetchRowsToSync.test.db", { memory: true });
 
 // create in-memory table for tests
 sqlite.exec(

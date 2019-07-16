@@ -40,6 +40,6 @@ SELECT
     `;
 
   // run query
-  const rows: QueryResult[] = (sqlite as SQlite).prepare(sql).all(params);
+  const rows: QueryResult[] = (sqlite as SQlite.Database).prepare(sql).all(params);
   return rows.map(row => row[returnColumn]);
 };
