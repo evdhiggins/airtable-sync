@@ -1,6 +1,6 @@
 {
   "name": "@evdhiggins/airtable-sync",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A one-way sync from a local datasource to Airtable",
   "main": "./built/main.js",
   "types": "built/main.d.ts",
@@ -37,7 +37,7 @@
     "typescript-type-writer": "github:evdhiggins/typescript-type-writer"
   },
   "dependencies": {
-    "airtable": "^0.6.0",
+    "airtable": "^0.7.0",
     "better-sqlite3": "^5.4.0",
     "pg-promise": "^8.7.4"
   }
