@@ -1,16 +1,17 @@
 import * as PGP from "pg-promise";
 import { LocalSchema } from "../../interfaces/ISchema";
 
-export default async (
+export default (
   pg: PGP.IDatabase<any>,
   schema: LocalSchema,
   row: any
 ): Promise<void> => {
   const sql: string = `
 UPDATE $[tableName:name]
-SET $[syncColumnName] = $[syncColumnFalse],
+SET $[syncColumnName:name] = $[syncColumnFalse],
   $[airtableIdColumnName:name] = $[airtableId]
-WHERE $[primaryKeyColumnName:name] = $[localId];`;
+WHERE $[primaryKeyColumnName:name] = $[localId];
+`;
 
   return pg.none(sql, {
     tableName: schema.tableName,
