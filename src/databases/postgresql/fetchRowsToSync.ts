@@ -14,15 +14,15 @@ export default (
   if (!dbColumns.includes(schema.idColumns.airtable)) {
     dbColumns.push(schema.idColumns.airtable);
   }
-  const preparedColumns: string[] = dbColumns.map(PGP.as.name);
   const sql: string = `
-SELECT ${preparedColumns.join(",")}
+SELECT $[dbColumns:name]
 FROM $[tableName:name]
 WHERE $[syncColumnName:name] = $[syncFlagTrue]
 `;
   return pg.any(sql, {
     tableName: schema.tableName,
     syncColumnName: schema.syncFlag.columnName,
-    syncFlagTrue: schema.syncFlag.true
+    syncFlagTrue: schema.syncFlag.true,
+    dbColumns
   })
 };
