@@ -22,6 +22,7 @@ WHERE $[syncColumnName:name] = $[syncFlagTrue]
   return pg.any(sql, {
     tableName: schema.tableName,
     syncColumnName: schema.syncFlag.columnName,
-    syncFlagTrue: schema.syncFlag.true
+    syncFlagTrue: schema.syncFlag.true,
+    dbColumns
   })
 };
