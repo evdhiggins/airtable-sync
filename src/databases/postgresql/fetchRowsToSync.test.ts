@@ -55,7 +55,7 @@ describe("postgresql fetchRowsToSync: It should... ", () => {
 
   test("Call pg.any with correct raw SQL", () => {
     const expectedSql = `
-SELECT "column_one","id","record_id"
+SELECT $[dbColumns:name]
 FROM $[tableName:name]
 WHERE $[syncColumnName:name] = $[syncFlagTrue]
 `;
@@ -82,7 +82,7 @@ WHERE "sync_flag" = 'T'
     }
     ]);
     const expectedSql = `
-SELECT "column_one","id","record_id"
+SELECT $[dbColumns:name]
 FROM $[tableName:name]
 WHERE $[syncColumnName:name] = $[syncFlagTrue]
 `;
@@ -101,7 +101,7 @@ WHERE $[syncColumnName:name] = $[syncFlagTrue]
     }
     ]);
     const expectedSql = `
-SELECT "column_one","record_id","id"
+SELECT $[dbColumns:name]
 FROM $[tableName:name]
 WHERE $[syncColumnName:name] = $[syncFlagTrue]
 `;
