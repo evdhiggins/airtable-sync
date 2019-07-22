@@ -9,7 +9,7 @@ import ISchema, {
 import IDatabase from "../interfaces/IDatabase";
 import SycnRowFactory, { SyncRow } from "./SyncRow";
 import { AirtableSync } from "./AirtableSync";
-import Airtable = require("Airtable");
+import * as Airtable from 'airtable';
 
 function sleep(miliseconds: number): Promise<any> {
   return new Promise(res => {
@@ -254,6 +254,6 @@ export class Sync implements ISync {
   }
 }
 
-export default function(schema: ISchema, config: Config): Sync {
+export default function (schema: ISchema, config: Config): Sync {
   return new Sync(schema, config);
 }

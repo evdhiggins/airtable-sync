@@ -1,6 +1,6 @@
 import ISchema from "../interfaces/ISchema";
 import * as Sqlite from "better-sqlite3";
-import Airtable = require("Airtable");
+import * as Airtable from 'airtable';
 import { Config, SyncRunReport } from "../types";
 import SyncMasterFactory, { SyncMaster } from "../classes/SyncMaster";
 import { unlinkSync } from "fs";

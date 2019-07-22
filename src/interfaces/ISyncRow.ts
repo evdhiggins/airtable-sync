@@ -1,4 +1,4 @@
-import Airtable = require("Airtable");
+import * as Airtable from 'airtable';
 import { AirtableConfig, QueryResult } from "../types";
 
 export default interface ISyncRow {

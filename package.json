@@ -5,9 +5,7 @@
   "main": "./built/main.js",
   "types": "built/main.d.ts",
   "scripts": {
-    "build": "npm run build:types && npm run build:src",
-    "build:src": "npx tsc -p .",
-    "build:types": "npx ttw deploy",
+    "build": "tsc -p .",
     "publish:patch": "npm run build && npm version patch && npm publish",
     "test": "npx jest",
     "tests": "npm run test"
@@ -33,8 +31,7 @@
     "dotenv": "^8.0.0",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
-    "typescript": "^3.5.3",
-    "typescript-type-writer": "github:evdhiggins/typescript-type-writer"
+    "typescript": "^3.5.3"
   },
   "dependencies": {
     "airtable": "^0.7.0",

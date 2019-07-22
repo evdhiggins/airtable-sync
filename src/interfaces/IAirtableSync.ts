@@ -1,4 +1,4 @@
-import Airtable = require("Airtable");
+import * as Airtable from 'airtable';
 import { SyncRow } from "../classes/SyncRow";
 
 export default interface IAirtable {

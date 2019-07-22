@@ -1,4 +1,4 @@
-import Airtable = require("Airtable");
+import * as Airtable from 'airtable';
 import IAirtable from "../interfaces/IAirtableSync";
 import { SyncRow } from "./SyncRow";
 import { QueryResult } from "../types";
@@ -9,15 +9,15 @@ export class AirtableSync implements IAirtable {
     airtableData: QueryResult
   ): Promise<string> {
     try {
-    const record: Airtable.Record = await table.create(airtableData, {
+      const record: Airtable.Record = await table.create(airtableData, {
         typecast: true,
-    });
-    return record.getId();
+      });
+      return record.getId();
     } catch (err) {
       console.warn("Error adding row");
       console.warn(err);
       return null;
-  }
+    }
   }
 
   public async delete(row: SyncRow): Promise<Airtable.RecordData> {
@@ -82,6 +82,6 @@ export class AirtableSync implements IAirtable {
   }
 }
 
-export default function(): AirtableSync {
+export default function (): AirtableSync {
   return new AirtableSync();
 }

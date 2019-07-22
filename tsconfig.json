@@ -5,12 +5,21 @@
     "baseUrl": ".",
     "module": "commonjs",
     "target": "es2016",
-    "lib": ["dom", "es2017"],
+    "lib": [
+      "dom",
+      "es2017"
+    ],
     "paths": {
-      "airtable": ["node_modules/airtable/lib/airtable.js"],
-      "src/*": ["./src/*"]
+      "airtable": [
+        "./types/airtable/index.d.ts"
+      ],
+      "src/*": [
+        "./src/*"
+      ]
     },
     "declaration": true
   },
-  "include": ["./src/**/**/*"]
+  "include": [
+    "./src/**/**/*"
+  ]
 }

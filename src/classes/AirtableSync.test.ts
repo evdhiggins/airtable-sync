@@ -4,7 +4,7 @@ import { QueryResult } from "src/types";
 import IDatabase from "src/interfaces/IDatabase";
 import SyncRowFactory, { SyncRow } from "./SyncRow";
 import AirtableSyncFactory, { AirtableSync } from "./AirtableSync";
-import Airtable = require("Airtable");
+import * as Airtable from 'airtable';
 
 const airtable: Airtable = new Airtable({ apiKey: process.env.API_KEY });
 const table: Airtable.Table = airtable.base(process.env.BASE_ID)(

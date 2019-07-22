@@ -1,4 +1,4 @@
-import Airtable = require("Airtable");
+import * as Airtable from 'airtable';
 import { Column, QueryResult } from "../types";
 import IAssertionTests from "./IAssertionTests";
 
