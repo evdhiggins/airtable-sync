@@ -3,9 +3,7 @@ import updateSyncedRows from "./updateSyncedRows";
 import { rowMock, localSchemaMock } from "../../tests/mocks";
 import * as Sqlite from "better-sqlite3";
 
-const sqlite: Sqlite.Database = new Sqlite("./updateSyncedRows.test.db", {
-  memory: true,
-});
+const sqlite = new Sqlite(":memory:");
 
 // create in-memory table for tests
 sqlite.exec(

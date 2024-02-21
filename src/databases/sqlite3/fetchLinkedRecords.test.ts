@@ -3,9 +3,7 @@ import getLinkedRecords from "./fetchLinkedRecords";
 import * as Sqlite from "better-sqlite3";
 import { LinkedColumnDetails } from "../../interfaces/ISyncColumn";
 
-const sqlite: Sqlite.Database = new Sqlite("./fetchLinkedRecords.test.db", {
-  memory: true,
-});
+const sqlite = new Sqlite(":memory:");
 
 const linkDetailsMock: LinkedColumnDetails = {
   tableName: "orders",
