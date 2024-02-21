@@ -1,5 +1,5 @@
 import ISchema from "../interfaces/ISchema";
-import { Column } from "./Column";
+export { Column } from "./Column";
 
 /**
  * A row of results from a query
@@ -37,5 +37,3 @@ export type SyncRunReport = {
   name: string;
   rows: number;
 };
-
-export type Column = Column;

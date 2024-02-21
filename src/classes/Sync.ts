@@ -4,15 +4,15 @@ import assertionTester from "../assertionTester";
 import ISchema, {
   LocalSchema,
   AirtableSchema,
-  Filter
+  Filter,
 } from "../interfaces/ISchema";
 import IDatabase from "../interfaces/IDatabase";
 import SycnRowFactory, { SyncRow } from "./SyncRow";
 import { AirtableSync } from "./AirtableSync";
-import * as Airtable from 'airtable';
+import * as Airtable from "airtable";
 
 function sleep(miliseconds: number): Promise<any> {
-  return new Promise(res => {
+  return new Promise<void>((res) => {
     setTimeout(() => res(), miliseconds);
   });
 }
@@ -56,7 +56,7 @@ export class Sync implements ISync {
       tableId: schema.airtable.tableId || config.airtable.tableId,
       baseId: schema.airtable.baseId || config.airtable.baseId,
       apiKey: schema.airtable.apiKey || config.airtable.apiKey,
-      lookupByPrimaryKey: schema.airtable.lookupByPrimaryKey === true
+      lookupByPrimaryKey: schema.airtable.lookupByPrimaryKey === true,
     };
 
     // verify AirtableSchema / AirtableConfig inputs
@@ -74,8 +74,8 @@ export class Sync implements ISync {
 
     if (schema.filters) {
       assertionTester("schema", "filters", schema.filters);
-      schema.filters.forEach(filter =>
-        assertionTester("schema", "filter", filter)
+      schema.filters.forEach((filter) =>
+        assertionTester("schema", "filter", filter),
       );
       this._filters = this.prepareFilters(schema.filters);
     } else {
@@ -121,10 +121,12 @@ export class Sync implements ISync {
 
       if (filterResults.removeFromAirtable) {
         const deletedRow: Airtable.RecordData = await this._at.delete(row);
-        filterResults.removeFromAirtableCallbacks.forEach(fn => fn(deletedRow));
+        filterResults.removeFromAirtableCallbacks.forEach((fn) =>
+          fn(deletedRow),
+        );
       }
 
-      filterResults.actions.forEach(fn => fn(row.localRow()));
+      filterResults.actions.forEach((fn) => fn(row.localRow()));
 
       // toggle sync flag in local db
       await this.updateLocalDb(row);
@@ -141,7 +143,7 @@ export class Sync implements ISync {
       this._name || `${this._local.tableName} / ${this._airtable.tableId}`;
     return {
       name,
-      rows: this._rows.length
+      rows: this._rows.length,
     };
   }
 
@@ -151,9 +153,9 @@ export class Sync implements ISync {
       removeFromAirtable: false,
       skipSync: false,
       removeFromAirtableCallbacks: [],
-      actions: []
+      actions: [],
     };
-    this._filters.forEach(filter => {
+    this._filters.forEach((filter) => {
       if (filter.match(rowData)) {
         // a row will be removed if ANY filters match and require removal
         result.removeFromAirtable =
@@ -165,7 +167,7 @@ export class Sync implements ISync {
         // all matching remove callbacks will be called
         if (filter.removeFromAirtableCallback) {
           result.removeFromAirtableCallbacks.push(
-            filter.removeFromAirtableCallback
+            filter.removeFromAirtableCallback,
           );
         }
 
@@ -177,74 +179,70 @@ export class Sync implements ISync {
   }
 
   private prepareFilters(filters: Filter[]): IPreparedFilter[] {
-    return filters.reduce(
-      (acc, filter) => {
-        const prepFilter: any = Object.assign({}, filter);
+    return filters.reduce((acc, filter) => {
+      const prepFilter: any = Object.assign({}, filter);
 
-        // generate a matchFnFactory that will be passed the current
-        // value of filter.match and will return a function that accepts
-        // the filter value
-        let matchFnFactory: any;
-        let stringMatch: boolean = false;
-        if (filter.match instanceof RegExp) {
-          matchFnFactory = (reg: RegExp) => (v: string) => reg.test(v);
-          stringMatch = true;
-        } else if (typeof filter.match === "string") {
-          matchFnFactory = (matchStr: string) => (v: string) => matchStr === v;
-          stringMatch = true;
-        } else {
-          matchFnFactory = (fn: any) => fn;
-        }
-        const matchFunc: any = matchFnFactory(filter.match);
+      // generate a matchFnFactory that will be passed the current
+      // value of filter.match and will return a function that accepts
+      // the filter value
+      let matchFnFactory: any;
+      let stringMatch: boolean = false;
+      if (filter.match instanceof RegExp) {
+        matchFnFactory = (reg: RegExp) => (v: string) => reg.test(v);
+        stringMatch = true;
+      } else if (typeof filter.match === "string") {
+        matchFnFactory = (matchStr: string) => (v: string) => matchStr === v;
+        stringMatch = true;
+      } else {
+        matchFnFactory = (fn: any) => fn;
+      }
+      const matchFunc: any = matchFnFactory(filter.match);
 
-        // assign to the final filter.match value a function that receives
-        // the full QueryResult row, evaluates if the column is available,
-        // and calls the generated matchFunc with the column / row
-        prepFilter.match = (row: QueryResult) => {
-          if (filter.type === "column") {
-            const value: string = row[filter.localColumn];
-            if (typeof value === "undefined") {
-              // warn user if match column doesn't exist in data
-              console.warn(
-                `Filter column (${filter.localColumn}) not found in row:`
-              );
-              console.warn(row);
+      // assign to the final filter.match value a function that receives
+      // the full QueryResult row, evaluates if the column is available,
+      // and calls the generated matchFunc with the column / row
+      prepFilter.match = (row: QueryResult) => {
+        if (filter.type === "column") {
+          const value: string = row[filter.localColumn];
+          if (typeof value === "undefined") {
+            // warn user if match column doesn't exist in data
+            console.warn(
+              `Filter column (${filter.localColumn}) not found in row:`,
+            );
+            console.warn(row);
 
-              // return match = `false` if specified column doesn't exist
-              return false;
-            }
-            return matchFunc(row[filter.localColumn]);
+            // return match = `false` if specified column doesn't exist
+            return false;
           }
-          return matchFunc(stringMatch ? JSON.stringify(row) : row);
-        };
+          return matchFunc(row[filter.localColumn]);
+        }
+        return matchFunc(stringMatch ? JSON.stringify(row) : row);
+      };
 
-        prepFilter.removeFromAirtable = prepFilter.actions.includes(
-          "removeFromAirtable"
-        );
-        prepFilter.skipSync =
-          prepFilter.actions.includes("skipSync") ||
-          prepFilter.removeFromAirtable;
-        prepFilter.actions = prepFilter.actions.filter(
-          (f: Filter.Action) => typeof f === "function"
-        );
-        acc.push(prepFilter as IPreparedFilter);
-        return acc;
-      },
-      [] as IPreparedFilter[]
-    );
+      prepFilter.removeFromAirtable =
+        prepFilter.actions.includes("removeFromAirtable");
+      prepFilter.skipSync =
+        prepFilter.actions.includes("skipSync") ||
+        prepFilter.removeFromAirtable;
+      prepFilter.actions = prepFilter.actions.filter(
+        (f: Filter.Action) => typeof f === "function",
+      );
+      acc.push(prepFilter as IPreparedFilter);
+      return acc;
+    }, [] as IPreparedFilter[]);
   }
 
   private async getLocalData(): Promise<this> {
     const rows: QueryResult[] = await this._db.getRowsToSync(
       this._local,
-      this._columns
+      this._columns,
     );
     const schema: ISchema = {
       airtable: this._airtable,
       local: this._local,
-      columns: this._columns
+      columns: this._columns,
     };
-    this._rows = rows.map(row => SycnRowFactory(row, schema, this._db));
+    this._rows = rows.map((row) => SycnRowFactory(row, schema, this._db));
     return this;
   }
 
